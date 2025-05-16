@@ -612,7 +612,7 @@ namespace SendOperationPlan
                     foreach (repeatoperation obj in operatInfos2.FindAll(r => r.patientId == info.patientId && r.bedNo == info.bedNo).OrderByDescending(r=>r.sstime).ToList())
                     {
                         sendtext += $"<font color=\"info\">";
-                        sendtext +=  " <"+count2 +"> "+obj.operation+"|"+obj.anesthesiaMethod+"|"+obj.sstime;
+                        sendtext +=  " <"+(count2++) +"> "+obj.operation+"|"+obj.anesthesiaMethod+"|"+obj.sstime;
                         sendtext += $"</font> \r\n";
                         sendtext += $"\r\n";
                     }
