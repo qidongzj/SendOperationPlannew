@@ -41,9 +41,11 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.button6 = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -99,7 +101,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(26, 17);
+            this.button3.Location = new System.Drawing.Point(230, 22);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(96, 39);
             this.button3.TabIndex = 5;
@@ -109,7 +111,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(161, 17);
+            this.button4.Location = new System.Drawing.Point(332, 22);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(94, 39);
             this.button4.TabIndex = 6;
@@ -119,7 +121,7 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(316, 17);
+            this.button5.Location = new System.Drawing.Point(450, 22);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(119, 39);
             this.button5.TabIndex = 7;
@@ -162,16 +164,6 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "测试";
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.ForeColor = System.Drawing.Color.Red;
-            this.label3.Location = new System.Drawing.Point(263, 84);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(665, 12);
-            this.label3.TabIndex = 11;
-            this.label3.Text = "每日早上7:00 推送当日的手术排班消息到个人企业微信通知，每日下午15:00推送第二日的手术排班消息到个人企业微信通知";
-            // 
             // button6
             // 
             this.button6.Location = new System.Drawing.Point(27, 138);
@@ -181,6 +173,16 @@
             this.button6.Text = "推昨天重复数据";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.ForeColor = System.Drawing.Color.Red;
+            this.label3.Location = new System.Drawing.Point(263, 84);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(665, 12);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "每日早上7:00 推送当日的手术排班消息到个人企业微信通知，每日下午15:00推送第二日的手术排班消息到个人企业微信通知";
             // 
             // label4
             // 
@@ -192,11 +194,35 @@
             this.label4.TabIndex = 12;
             this.label4.Text = "每日上午7:00 推给管理者前一天手术中有住院患者做了多次手术的通知";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(27, 23);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(144, 16);
+            this.checkBox1.TabIndex = 13;
+            this.checkBox1.Text = "推给医生每日手术排班";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Checked = true;
+            this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox2.Location = new System.Drawing.Point(26, 45);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(180, 16);
+            this.checkBox2.TabIndex = 14;
+            this.checkBox2.Text = "患者手术重复的推给管理人员";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1230, 739);
+            this.Controls.Add(this.checkBox2);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.groupBox1);
@@ -234,6 +260,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox checkBox2;
         //private System.Windows.Forms.Timer timer2;
     }
 }

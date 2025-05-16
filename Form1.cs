@@ -703,8 +703,12 @@ namespace SendOperationPlan
             {
                 if (isEnabled)
                 {
-                    //下午三点推送第二天的手术排班
-                    SendMessage(true,false);
+                    if (checkBox1.Checked)//
+                    {
+                        //下午三点推送第二天的手术排班
+                        SendMessage(true, false);
+                        
+                    }
                     isEnabled = false;
                 }
             }
@@ -712,12 +716,18 @@ namespace SendOperationPlan
             {
                 if (isEnabled)
                 {
-                    //上午7点推送当天的手术排班
-                    SendMessage(false,false);
+                    if (checkBox1.Checked)//
+                    {
+                        //上午7点推送当天的手术排班
+                        SendMessage(false, false);
+                        
+                    }
+                    if (checkBox2.Checked)
+                    {
+                        //推送给管理员 前一天的手术排班消息有做多次手术的患者 推送给管理员
+                        SendlastdayMessage(false);
+                    }
                     isEnabled = false;
-
-                    //推送给管理员 前一天的手术排班消息有做多次手术的患者 推送给管理员
-                    SendlastdayMessage(false);
                 }
             }
             else if (DateTime.Now.ToString("HH:mm") == "15:30" || DateTime.Now.ToString("HH:mm") == "15:31" || DateTime.Now.ToString("HH:mm") == "15:32" || DateTime.Now.ToString("HH:mm") == "07:30" || DateTime.Now.ToString("HH:mm") == "07:31" || DateTime.Now.ToString("HH:mm") == "07:32")
