@@ -745,7 +745,7 @@ namespace SendOperationPlan
             isEnabled = true;
             this.timer1.Interval = 90 * 1000; // 90秒轮询一次
 
-            
+            timer1.Start();
 
             button3.Enabled = false;
             button4.Enabled = true;
@@ -810,6 +810,16 @@ namespace SendOperationPlan
         private void button6_Click(object sender, EventArgs e)
         {
             SendlastdayMessage(true);
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

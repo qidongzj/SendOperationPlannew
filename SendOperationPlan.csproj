@@ -84,11 +84,20 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormWjz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormWjz.Designer.cs">
+      <DependentUpon>FormWjz.cs</DependentUpon>
+    </Compile>
     <Compile Include="OperatInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormWjz.resx">
+      <DependentUpon>FormWjz.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
