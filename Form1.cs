@@ -94,9 +94,50 @@ namespace SendOperationPlan
             }
             catch(Exception ex)
             {
-                
+                WriteErrorLog("企业微信接口异常:" +ex.Message);
                 return ex.Message;
             }
+        }
+
+
+
+        /// <summary>
+        /// 记录日志
+        /// </summary>
+        /// <param name="log"></param>
+        private void WriteErrorLog(string log)
+        {
+            //if (!LogEnabled) return;
+
+            if (!Directory.Exists(Path.Combine(Application.StartupPath, "log"))) return;
+            try
+            {
+                string logfile = Path.Combine(Application.StartupPath, "log\\ErrorMessage_" + DateTime.Now.ToString("yyyyMMdd") + ".log");
+                FileStream fs = new FileStream(logfile, FileMode.Append);
+                try
+                {
+                    StreamWriter sw = new StreamWriter(fs);
+                    try
+                    {
+                        sw.Write(string.Format("{0}\r\n{1}\r\n{2}\r\n",
+                                                   "--------------------------------------------------",
+                                                   DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                                                   log
+                                                   )
+                                     );
+                    }
+                    finally
+                    {
+                        sw.Close();
+                    }
+                }
+                finally
+                {
+                    fs.Close();
+                }
+            }
+            catch
+            { }
         }
 
 
@@ -274,7 +315,8 @@ namespace SendOperationPlan
 
             if (dt.Rows.Count == 0)
             {
-                MessageBox.Show(datetime2+"没有手术排班记录!");
+                //MessageBox.Show(datetime2+"没有手术排班记录!");
+                WriteLog("没有手术排班记录:"+ datetime);
                 return;
             }
 
@@ -322,7 +364,8 @@ namespace SendOperationPlan
 
             if (operatInfos.Count == 0)
             {
-                MessageBox.Show(datetime2+"没有手术排班记录!");
+                //MessageBox.Show(datetime2+"没有手术排班记录!");
+                WriteLog("没有手术排班记录:" + datetime);
                 return;
             }
 
@@ -373,7 +416,7 @@ namespace SendOperationPlan
                         info.operatingRoomNoName = "未分配";
                         info.operation = "待确认";
                     }
-                    sendtext += $"【" + (count++) + "】手术间号:" + info.operatingRoomNoName + "|第" + info.sequence + "台|" + info.patName + "、" + info.sex + "、" + info.patAge + "岁|" + info.operation + "|" + info.anesthesiaMethod + "|" + info.surgeonName; //+ "|" + info.sstime + "(手术时间)";
+                    sendtext += $"【" + (count++) + "】手术间号:" + info.operatingRoomNoName + "|第" + info.sequence + "台|" + info.patName + "、" + info.sex + "、" + info.patAge + "岁|"+info.inpNo+"(住院号)|"+info.operatdeptName +"|"+ info.operation + "|" + info.anesthesiaMethod + "|" + info.surgeonName; //+ "|" + info.sstime + "(手术时间)";
                     sendtext += "\r\n";
                 }
 
@@ -445,8 +488,15 @@ namespace SendOperationPlan
         {
 
             DateTime dateTime = DateTime.Now;
-        
-            dateTime = dateTime.AddDays(-1);
+
+            if (istest == false)
+            {
+                dateTime = dateTime.AddDays(-1);
+            }
+            else
+            {
+                dateTime = dateTime.AddDays( -comboBox1.SelectedIndex);
+            }
             string datetime = dateTime.ToString("yyyy-MM-dd");
             string datetime2 = dateTime.ToString("yyyy年MM月dd日");
 
@@ -490,6 +540,7 @@ namespace SendOperationPlan
             if (dt.Rows.Count == 0)
             {
                 //MessageBox.Show(datetime2 + "没有手术排班记录!");
+                WriterepeatLog("没有手术排班记录:" + datetime);
                 return;
             }
 
@@ -528,14 +579,18 @@ namespace SendOperationPlan
                     sex = dr["SEX"].ToString(),
                     state = dr["STATE"].ToString().Trim()
                 };
-                
+
+                if (info.state == "3")
+                {
                     operatInfos.Add(info);
+                }
                 
 
             }
 
             if (operatInfos.Count == 0)
             {
+                WriterepeatLog("没有手术已做记录:" + datetime);
                 //MessageBox.Show(datetime2 + "没有手术排班记录!");
                 return;
             }
@@ -544,7 +599,7 @@ namespace SendOperationPlan
             string inpnostr = "'" + string.Join("','", operatInfos.Select(x => x.inpNo)) + "'";
             string bednostr = "'" + string.Join("','", operatInfos.Select(x => x.bedNo)) + "'";
 
-            string sqll = "SELECT A.BED_NO,A.PATIENT_ID,A.SCHEDULED_DATE_TIME,A.ANESTHESIA_METHOD,A.OPERATION_NAME,A.SURGEON  from [155.155.100.107].docare.dbo.MED_OPERATION_MASTER A WHERE  ( CONVERT(VARCHAR, SCHEDULED_DATE_TIME, 23) < '" + datetime + "'  )  \r\nAND OPER_STATUS NOT IN (-80)  AND A.PATIENT_ID IN ("+patidstr+")  AND A.BED_NO IN ("+bednostr+")  ORDER BY A.OPERATING_ROOM_NO ASC,A.SEQUENCE ASC";
+            string sqll = "SELECT A.BED_NO,A.PATIENT_ID,A.SCHEDULED_DATE_TIME,A.ANESTHESIA_METHOD,A.OPERATION_NAME,A.SURGEON  from [155.155.100.107].docare.dbo.MED_OPERATION_MASTER A WHERE  ( CONVERT(VARCHAR, SCHEDULED_DATE_TIME, 23) < '" + datetime + "'  )  \r\nAND OPER_STATUS NOT IN (-80) and OPER_STATUS>0  AND A.PATIENT_ID IN (" + patidstr+")  AND A.BED_NO IN ("+bednostr+")  ORDER BY A.OPERATING_ROOM_NO ASC,A.SEQUENCE ASC";
 
 
             SqlParameter[] parameters3 = {
@@ -602,7 +657,7 @@ namespace SendOperationPlan
 
 
                     sendtext += $"<font color=\"info\">\r\n ";
-                    sendtext += $"【" + (count++) + "】手术间号:" + info.operatingRoomNoName + "|第" + info.sequence + "台|" + info.patName + "、" + info.sex + "、" + info.patAge + "岁|" + info.operation + "|" + info.anesthesiaMethod + "|" + info.surgeonName+"|"+ datetime2;
+                    sendtext += $"【" + (count++) + "】手术间号:" + info.operatingRoomNoName + "|第" + info.sequence + "台|" + info.patName + "、" + info.sex + "、" + info.patAge + "岁|" + info.inpNo + "(住院号)|" + info.operatdeptName +"|" + info.operation + "|" + info.anesthesiaMethod + "|" + info.surgeonName+"|"+ datetime2;
                     sendtext += $"</font>  ";
      
                     sendtext += $"<font color=\"warning\">  ";
@@ -626,6 +681,8 @@ namespace SendOperationPlan
 
             if (TT3 == false)
             {
+
+                WriterepeatLog("未有重复手术的患者数据: "+datetime);
                 return;
                     
             }
@@ -755,8 +812,9 @@ namespace SendOperationPlan
             isEnabled = true;
             this.timer1.Interval = 90 * 1000; // 90秒轮询一次
 
-            timer1.Start();
+            this.timer1?.Start();
 
+            comboBox1.SelectedIndex = 0;
             button3.Enabled = false;
             button4.Enabled = true;
         }

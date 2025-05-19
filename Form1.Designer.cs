@@ -46,8 +46,11 @@
             this.label4 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -62,9 +65,9 @@
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(39, 254);
+            this.richTextBox1.Location = new System.Drawing.Point(39, 376);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(169, 234);
+            this.richTextBox1.Size = new System.Drawing.Size(169, 112);
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "";
             // 
@@ -80,7 +83,7 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(108, 204);
+            this.textBox1.Location = new System.Drawing.Point(99, 283);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 21);
             this.textBox1.TabIndex = 3;
@@ -89,7 +92,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(37, 207);
+            this.label1.Location = new System.Drawing.Point(28, 286);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(65, 12);
             this.label1.TabIndex = 4;
@@ -151,7 +154,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.button6);
+            this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Controls.Add(this.button2);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.textBox1);
@@ -166,11 +169,11 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(27, 138);
+            this.button6.Location = new System.Drawing.Point(25, 61);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(144, 34);
             this.button6.TabIndex = 5;
-            this.button6.Text = "推昨天重复数据";
+            this.button6.Text = "推重复数据";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
@@ -197,6 +200,8 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Location = new System.Drawing.Point(27, 23);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(144, 16);
@@ -217,6 +222,57 @@
             this.checkBox2.Text = "患者手术重复的推给管理人员";
             this.checkBox2.UseVisualStyleBackColor = true;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.comboBox1);
+            this.groupBox2.Controls.Add(this.button6);
+            this.groupBox2.Location = new System.Drawing.Point(30, 141);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 113);
+            this.groupBox2.TabIndex = 6;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "0是当天，1是昨天，依此类推";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30"});
+            this.comboBox1.Location = new System.Drawing.Point(25, 35);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(144, 20);
+            this.comboBox1.TabIndex = 6;
             // 
             // Form1
             // 
@@ -240,6 +296,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -264,6 +321,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.ComboBox comboBox1;
         //private System.Windows.Forms.Timer timer2;
     }
 }
