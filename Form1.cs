@@ -586,12 +586,14 @@ namespace SendOperationPlan
 
 
 
+            //if(operatInfos2)
 
             string sendtext = string.Empty;
             sendtext += $"`住院患者重复手术告知`\r\n";
             sendtext += $"**事项详情:**  \r\n";
             //sendtext += $"<font color=\"info\"> \r\n";
             int count = 1;
+            bool TT3 = false;
             foreach (OperatInfo info in operatInfos)
             {
 
@@ -615,9 +617,17 @@ namespace SendOperationPlan
                         sendtext +=  " <"+(count2++) +"> "+obj.operation+"|"+obj.anesthesiaMethod+"|"+obj.sstime;
                         sendtext += $"</font> \r\n";
                         sendtext += $"\r\n";
+
+                        TT3 = true;
                     }
                     sendtext += $"\r\n";
                 }
+            }
+
+            if (TT3 == false)
+            {
+                return;
+                    
             }
 
             
