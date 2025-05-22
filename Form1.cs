@@ -17,6 +17,9 @@ using System.Diagnostics;  // 推荐使用Newtonsoft.Json处理JSON数据[3,5](@
 
 namespace SendOperationPlan
 {
+    /// <summary>
+    /// 手术排班计划推送窗体
+    /// </summary>
     public partial class Form1 : Form
     {
 
