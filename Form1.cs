@@ -821,8 +821,15 @@ namespace SendOperationPlan
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            this.timer1?.Dispose();
-            //this.timer2?.Dispose();
+            //this.timer1?.Dispose();
+
+            if (e.CloseReason == CloseReason.UserClosing) // 仅处理用户点击关闭按钮
+            {
+                e.Cancel = true;        // 取消关闭操作
+                this.WindowState = FormWindowState.Minimized; // 最小化窗口
+                this.ShowInTaskbar = false;     // 隐藏任务栏图标
+                this.notifyIcon1.Visible = true;      // 显示托盘图标
+            }
         }
 
         /// <summary>
@@ -888,6 +895,51 @@ namespace SendOperationPlan
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+        {
+            this.ShowInTaskbar = true;          // 显示任务栏图标
+            this.WindowState = FormWindowState.Normal; // 恢复窗口
+            this.Activate();                    // 激活窗口到前台
+            notifyIcon1.Visible = false;         // 隐藏托盘图标
+        }
+
+        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //if(if(MessageBoxButtons.YesNo==dia)
+
+            DialogResult result = MessageBox.Show(
+               "确认退出程序吗？  \r\n 本程序是推送手术排班计划到手术医生企业微信的定时通知任务！ 如您不清楚情况，请不要退出本程序，请点 “否” 按钮 ！",
+               "手术排班推送计划",
+               MessageBoxButtons.YesNo,
+               MessageBoxIcon.Question
+           );
+            if (result == DialogResult.Yes)
+            {
+                this.timer1?.Dispose();
+                notifyIcon1.Visible = false; // 隐藏托盘图标
+                Application.Exit();         // 彻底退出程序
+            }
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.ShowInTaskbar = false;
+                notifyIcon1.Visible = true;
+            }
+        }
+
+        private void 最大化ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+                this.ShowInTaskbar = true;
+                this.WindowState = FormWindowState.Normal; // 恢复窗口
+                this.Activate();                    // 激活窗口到前台
+                notifyIcon1.Visible = false;
+          
         }
     }
 }
