@@ -375,14 +375,14 @@ namespace SendOperationPlan
                     wjzInfo.Sjbqdm = row["SJBQDM"]?.ToString();
                     wjzInfo.Sjbqmc = row["SJBQMC"]?.ToString();
                     wjzInfo.Sjrq = row["SJRQ"]?.ToString();
-                    wjzInfo.Ysdfzt = (row["JLZT"] ?? "-1").ToString().Trim();  //0未答复 1已答复
+                    wjzInfo.Ysdfzt = (row["STATUS"] ?? "-1").ToString().Trim();  //0未答复 1已答复
                     wjzInfo.Ysdfnr = row["YSDFNR"]?.ToString();
                     wjzInfo.Jsysdm = row["JSYSDM"]?.ToString();
                     wjzInfo.Jsysmc = row["JSYSMC"]?.ToString();
                     wjzInfo.Ysjssj = row["JSYSSJ"]?.ToString();
                     wjzInfo.Czsj=row["CZSJ"]?.ToString();//处置时间
-                    wjzInfo.Dfysmc = row["DFYSMC"]?.ToString();//答复医生姓名
-                    wjzInfo.Dfysdm = row["DFYSDM"]?.ToString();//答复医生代码
+                    wjzInfo.Dfysmc = row["DFYSMC"]?.ToString();//应该答复医生姓名
+                    wjzInfo.Dfysdm = row["DFYSDM"]?.ToString();//应该答复医生代码
                     wjzInfo.SendTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
                     wjzBeginSendInfosList.Add(wjzInfo);
 
@@ -668,7 +668,7 @@ namespace SendOperationPlan
                                    "\r\n" +
                                    $" 送检科室：{info.Sjksmc} " +
                                    "\r\n" +
-                                   $" 接收医生：{info.Jsysmc} " +
+                                   $" 接收医生：{info.Dfysmc} " +
                                     $"</font>     \r\n" +
                                    $"消息日期：<font color=\"warning\">{datetime2}</font>  \n";
                         ;
@@ -693,9 +693,9 @@ namespace SendOperationPlan
                                     "\r\n" +
                                     $" 送检科室：{info.Sjksmc} " +
                                      "\r\n" +
-                                    $" 接收医生：{info.Jsysmc} " +
+                                    $" 接收医生：{info.Dfysmc} " +
                                      "\r\n" +
-                                    $" 处理医生：{info.Dfysmc} " +
+                                    $" 处理医生：{info.Jsysmc} " +
                                      "\r\n" +
                                     $" 处理时间：{info.Czsj.Replace("-", "")} " +
                                      "\r\n" +
@@ -743,7 +743,7 @@ namespace SendOperationPlan
                     }
                     else
                     {
-                        xxx = info.Jsysdm;
+                        xxx = info.Dfysdm;
                     }
 
                     WriteLog("url:" + sendUrl + "    \r\n  token:" + token + "  \r\n userid:" + xxx + " \r\n  sendmessage:" + content + " \r\n  回参:" + msg);
