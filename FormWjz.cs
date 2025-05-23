@@ -660,9 +660,9 @@ namespace SendOperationPlan
                                    //"\r\n" +
                                    //$" 报告单号：{info.Bgdh} " +
                                    //"\r\n" +
-                                   $" 送检时间：{info.Sjrq} " +
-                                   "\r\n" +
-                                   $" 报告时间：{info.Bgsj} " +
+                                   //$" 送检时间：{info.Sjrq} " +
+                                   //"\r\n" +
+                                   $" 报告时间：{info.Bgsj.Replace("-", "")} " +
                                    "\r\n" +
                                    $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
                                    "\r\n" +
@@ -685,9 +685,9 @@ namespace SendOperationPlan
                                    // "\r\n" +
                                    //$" 报告单号：{info.Bgdh} " +
                                    // "\r\n" +
-                                   $" 送检时间：{info.Sjrq} " +
-                                    "\r\n" +
-                                    $" 报告时间：{info.Bgsj} " +
+                                   //$" 送检时间：{info.Sjrq} " +
+                                   // "\r\n" +
+                                    $" 报告时间：{info.Bgsj.Replace("-", "")} " +
                                      "\r\n" +
                                     $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
                                     "\r\n" +
@@ -697,7 +697,7 @@ namespace SendOperationPlan
                                      "\r\n" +
                                     $" 处理医生：{info.Dfysmc} " +
                                      "\r\n" +
-                                    $" 处理时间：{info.Czsj} " +
+                                    $" 处理时间：{info.Czsj.Replace("-", "")} " +
                                      "\r\n" +
                                     $" 医生答复内容：{info.Ysdfnr} " +
                                      "\r\n" +
