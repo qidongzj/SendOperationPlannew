@@ -48,6 +48,7 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
             this.contextMenuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -59,28 +60,30 @@
             this.checkBox1.AutoSize = true;
             this.checkBox1.Checked = true;
             this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(46, 53);
+            this.checkBox1.Location = new System.Drawing.Point(1206, 30);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(168, 16);
             this.checkBox1.TabIndex = 0;
             this.checkBox1.Text = "门诊危急值推送到开单医生";
             this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.Visible = false;
             // 
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
             this.checkBox2.Checked = true;
             this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox2.Location = new System.Drawing.Point(46, 76);
+            this.checkBox2.Location = new System.Drawing.Point(1206, 53);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(168, 16);
             this.checkBox2.TabIndex = 1;
             this.checkBox2.Text = "住院危急值推送到开单医生";
             this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.Visible = false;
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(482, 53);
+            this.button5.Location = new System.Drawing.Point(240, 49);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(119, 39);
             this.button5.TabIndex = 10;
@@ -90,7 +93,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(382, 53);
+            this.button4.Location = new System.Drawing.Point(140, 49);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(94, 39);
             this.button4.TabIndex = 9;
@@ -100,7 +103,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(280, 53);
+            this.button3.Location = new System.Drawing.Point(38, 49);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(96, 39);
             this.button3.TabIndex = 8;
@@ -113,7 +116,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.ForeColor = System.Drawing.Color.Red;
-            this.label1.Location = new System.Drawing.Point(237, 9);
+            this.label1.Location = new System.Drawing.Point(390, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(298, 24);
             this.label1.TabIndex = 11;
@@ -137,14 +140,14 @@
             // 最大化ToolStripMenuItem
             // 
             this.最大化ToolStripMenuItem.Name = "最大化ToolStripMenuItem";
-            this.最大化ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.最大化ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.最大化ToolStripMenuItem.Text = "最大化";
             this.最大化ToolStripMenuItem.Click += new System.EventHandler(this.最大化ToolStripMenuItem_Click);
             // 
             // 退出ToolStripMenuItem
             // 
             this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
-            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.退出ToolStripMenuItem.Text = "退出";
             this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
             // 
@@ -155,9 +158,9 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.dataGridView1);
-            this.groupBox1.Location = new System.Drawing.Point(34, 107);
+            this.groupBox1.Location = new System.Drawing.Point(34, 98);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(958, 509);
+            this.groupBox1.Size = new System.Drawing.Size(1023, 587);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "上一次的推送消息记录";
@@ -169,7 +172,7 @@
             this.dataGridView1.Location = new System.Drawing.Point(3, 17);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(952, 489);
+            this.dataGridView1.Size = new System.Drawing.Size(1017, 567);
             this.dataGridView1.TabIndex = 0;
             // 
             // groupBox2
@@ -178,9 +181,9 @@
             this.groupBox2.Controls.Add(this.textBox1);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.richTextBox1);
-            this.groupBox2.Location = new System.Drawing.Point(1063, 142);
+            this.groupBox2.Location = new System.Drawing.Point(1079, 107);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(292, 485);
+            this.groupBox2.Size = new System.Drawing.Size(292, 575);
             this.groupBox2.TabIndex = 15;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "测试";
@@ -189,13 +192,13 @@
             // 
             this.richTextBox1.Location = new System.Drawing.Point(52, 131);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(212, 343);
+            this.richTextBox1.Size = new System.Drawing.Size(212, 420);
             this.richTextBox1.TabIndex = 2;
             this.richTextBox1.Text = "";
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(121, 75);
+            this.textBox1.Location = new System.Drawing.Point(127, 75);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 21);
             this.textBox1.TabIndex = 5;
@@ -204,7 +207,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(50, 78);
+            this.label2.Location = new System.Drawing.Point(56, 78);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(65, 12);
             this.label2.TabIndex = 6;
@@ -218,12 +221,23 @@
             this.button1.TabIndex = 7;
             this.button1.Text = "测试推送";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(764, 76);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(293, 12);
+            this.label3.TabIndex = 16;
+            this.label3.Text = "推送过的危急值 写到这个表SendWeChatCriticalValue";
             // 
             // FormWjz
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1404, 733);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label1);
@@ -268,5 +282,6 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label label3;
     }
 }
