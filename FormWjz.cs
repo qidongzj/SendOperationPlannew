@@ -648,7 +648,7 @@ namespace SendOperationPlan
                     //string content2 = "";
                     //string content3 = "";
                     //string content4 = "";
-                    if (info.Ysdfzt == "0")
+                    if (info.Ysdfzt == "0" || info.Ysdfzt == "11")
                     {
                         content = $"`住院患者危急值通知(未处理)`\r\n" +
                                     $"**事项详情:**  \r\n" +
