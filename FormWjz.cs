@@ -609,7 +609,7 @@ namespace SendOperationPlan
                     {
                         string CriticalValuestr = string.Join(",", wjzInfosmz.Where(r => r.Gxlx == 2 && r.是否推送成功 == "成功").Select(x => x.CriticalValue));
 
-                        string sql45 = "update SendWeChatCriticalValue set YSDFZT=1 where YSDFZT=0  and CriticalType=1 and CriticalValue in （" + CriticalValuestr + ")";
+                        string sql45 = "update SendWeChatCriticalValue set YSDFZT=1 where YSDFZT=0  and CriticalType=1 and CriticalValue in (" + CriticalValuestr + ")";
 
                         WriteLog("更新sql语句:" + sql45);
 
@@ -769,7 +769,7 @@ namespace SendOperationPlan
                     {
                         string CriticalValuestr = string.Join(",", wjzInfoszy.Where(r => r.Gxlx == 2 && r.是否推送成功 == "成功").Select(x => x.CriticalValue));
 
-                        string sql451 = "update SendWeChatCriticalValue set YSDFZT=1 where YSDFZT=0  and CriticalType=2 and CriticalValue in （" + CriticalValuestr + ")";
+                        string sql451 = "update SendWeChatCriticalValue set YSDFZT=1 where YSDFZT=0  and CriticalType=2 and CriticalValue in (" + CriticalValuestr + ")";
 
                         WriteLog("更新sql语句:" + sql451);
 
