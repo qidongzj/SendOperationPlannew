@@ -375,7 +375,8 @@ namespace SendOperationPlan
                     wjzInfo.Sjbqdm = row["SJBQDM"]?.ToString();
                     wjzInfo.Sjbqmc = row["SJBQMC"]?.ToString();
                     wjzInfo.Sjrq = row["SJRQ"]?.ToString();
-                    wjzInfo.Ysdfzt = (row["STATUS"] ?? "-1").ToString().Trim();  //0未答复 1已答复
+                    wjzInfo.Ysdfzt = (row["STATUS"] ?? "-1").ToString().Trim()=="11"?"0": (row["STATUS"] ?? "-1").ToString().Trim();  //0未答复 1已答复
+                   // if()
                     wjzInfo.Ysdfnr = row["YSDFNR"]?.ToString();
                     wjzInfo.Jsysdm = row["JSYSDM"]?.ToString();
                     wjzInfo.Jsysmc = row["JSYSMC"]?.ToString();
@@ -650,7 +651,7 @@ namespace SendOperationPlan
                     //string content4 = "";
                     if (info.Ysdfzt == "0" || info.Ysdfzt == "11")
                     {
-                        info.Ysdfzt = "0";
+                        
                         content = $"`住院患者危急值通知(未处理)`\r\n" +
                                     $"**事项详情:**  \r\n" +
                                     $"<font color=\"blue\"> \r\n" +
