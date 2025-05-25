@@ -650,6 +650,7 @@ namespace SendOperationPlan
                     //string content4 = "";
                     if (info.Ysdfzt == "0" || info.Ysdfzt == "11")
                     {
+                        info.Ysdfzt = "0";
                         content = $"`住院患者危急值通知(未处理)`\r\n" +
                                     $"**事项详情:**  \r\n" +
                                     $"<font color=\"blue\"> \r\n" +
