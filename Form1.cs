@@ -37,7 +37,12 @@ namespace SendOperationPlan
 
         public List<OperatInfo> operatInfosall  = new List<OperatInfo>(); // 用于存储手术信息的列表
 
+        private bool IsEnable2 = false;
+        private bool IsEnable3  = false;
 
+
+        private System.Timers.Timer _timer ; // 每90秒检查
+        private System.Timers.Timer _timer2 ; // 每100秒检查
         /// <summary>
         /// 获取token
         /// </summary>
@@ -232,6 +237,7 @@ namespace SendOperationPlan
 
             this.button1.Enabled = false;
             this.button2.Enabled = false;
+            this.button6.Enabled = false;
 
 
             //当天
@@ -239,6 +245,7 @@ namespace SendOperationPlan
 
             this.button1.Enabled = true;
             this.button2.Enabled = true;
+            this.button6.Enabled = true;
 
         }
 
@@ -753,12 +760,14 @@ namespace SendOperationPlan
 
             this.button1.Enabled = false;
             this.button2.Enabled = false;
+            this.button6.Enabled = false;
 
             //第二天
             SendMessage(true,true);
 
             this.button1.Enabled = true;
             this.button2.Enabled = true;
+            this.button6.Enabled = true;
 
         }
 
@@ -810,12 +819,73 @@ namespace SendOperationPlan
 
         }
 
+
+
+
+
         private void Form1_Load(object sender, EventArgs e)
         {
             isEnabled = true;
-            this.timer1.Interval = 90 * 1000; // 90秒轮询一次
 
-            this.timer1?.Start();
+            //this.timer1.Interval = 90 * 1000; // 90秒轮询一次
+            //this.timer1?.Start();
+            this._timer = new System.Timers.Timer(90 * 1000); // 每90秒检查
+            this._timer2 = new System.Timers.Timer(100 * 1000); // 每100秒检查
+
+            this._timer?.Start();
+            this._timer2?.Start();
+
+
+            //System.Timers.Timer _timer = new System.Timers.Timer(90*1000); // 每90秒检查
+            _timer.Elapsed += (s, e1) =>
+            {
+                if(IsEnable2 || (e1.SignalTime.Hour == 15 && (e1.SignalTime.Minute == 0|| e1.SignalTime.Minute==1)))
+                {
+
+                    if (checkBox1.Checked)//
+                    {
+                        //下午三点推送第二天的手术排班
+                        
+                        SendMessage(true, true);
+                    }
+                    if (this._timer.Interval == 90 * 1000)
+                    {
+                        _timer.Stop(); // 停止定时器
+                        _timer.Interval = TimeSpan.FromHours(24).TotalMilliseconds; // 重置为24小时
+                        _timer.Start(); // 重新启动定时器
+                        IsEnable2 = true;
+                    }
+                }
+            };
+
+
+            //System.Timers.Timer _timer2  = new System.Timers.Timer(100 * 1000); // 每100秒检查
+            _timer2.Elapsed += (s, e1) =>
+            {
+                if( IsEnable3 || (e1.SignalTime.Hour == 7 && (e1.SignalTime.Minute == 0 || e1.SignalTime.Minute == 1)))
+                {
+
+                    if (checkBox1.Checked)//
+                    {
+                        //上午7点推送当天的手术排班
+                        SendMessage(false, true);
+
+                    }
+                    if (checkBox2.Checked)
+                    {
+                        //推送给管理员 前一天的手术排班消息有做多次手术的患者 推送给管理员
+                        SendlastdayMessage(true);
+                    }
+                    if (this._timer2.Interval == 100 * 1000)
+                    {
+                        _timer2.Stop(); // 停止定时器
+                        _timer2.Interval = TimeSpan.FromHours(24).TotalMilliseconds; // 重置为24小时
+                        _timer2.Start(); // 重新启动定时器
+                        IsEnable3 = true;
+                    }
+                }
+            };
+
 
             comboBox1.SelectedIndex = 0;
             button3.Enabled = false;
@@ -824,7 +894,7 @@ namespace SendOperationPlan
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //this.timer1?.Dispose();
+            
 
             if (e.CloseReason == CloseReason.UserClosing) // 仅处理用户点击关闭按钮
             {
@@ -842,8 +912,18 @@ namespace SendOperationPlan
         /// <param name="e"></param>
         private void button3_Click(object sender, EventArgs e)
         {
-            this.timer1?.Start();
-            //this.timer2?.Start();
+            //this.timer1?.Start();
+            _timer.Interval = 90000; // 每90秒检查
+            _timer?.Start();
+
+            _timer2.Interval = 100000; // 每100秒检查
+            _timer2?.Start();
+
+
+
+            this.IsEnable2 = false; // 重置标志位
+            this.IsEnable3 = false; // 重置标志位
+
             button3.Enabled = false;
             button4.Enabled = true;
         }
@@ -855,10 +935,15 @@ namespace SendOperationPlan
         /// <param name="e"></param>
         private void button4_Click(object sender, EventArgs e)
         {
-            this.timer1?.Stop();
-            //this.timer2?.Stop();
+            //this.timer1?.Stop();
+
+            _timer?.Stop();
+            _timer2?.Stop();
+
             button3.Enabled = true;
             button4.Enabled = false;
+            this.IsEnable2=false; // 重置标志位
+            this.IsEnable3 = false; // 重置标志位
 
         }
 
@@ -887,7 +972,13 @@ namespace SendOperationPlan
 
         private void button6_Click(object sender, EventArgs e)
         {
+            this.button1.Enabled = false;
+            this.button2.Enabled = false;
+            button6.Enabled = false;
             SendlastdayMessage(true);
+            this.button1.Enabled = true;
+            this.button2.Enabled = true;
+            button6.Enabled = true; 
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
@@ -920,7 +1011,9 @@ namespace SendOperationPlan
            );
             if (result == DialogResult.Yes)
             {
-                this.timer1?.Dispose();
+                this._timer?.Stop(); // 停止定时器
+                this._timer2?.Stop(); // 停止定时器
+                //this.timer1?.Dispose();
                 notifyIcon1.Visible = false; // 隐藏托盘图标
                 Application.Exit();         // 彻底退出程序
             }
