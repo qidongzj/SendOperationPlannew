@@ -293,8 +293,8 @@ namespace SendOperationPlan
                 " G.USER_NAME AS FIRST_OPERATION_NURSE_NAME, H.USER_NAME AS SECOND_OPERATION_NURSE_NAME, I.USER_NAME AS FIRST_SUPPLY_NURSE_NAME, J.USER_NAME AS SECOND_SUPPLY_NURSE_NAME,  " +
                 " K.USER_NAME AS THIRD_SUPPLY_NURSE_NAME, Q.DEPT_NAME AS WARD_CODE_NAME, case when A.VISIT_ID = 0 then '门诊' else '住院' end as SCHEDULE_TYPE ,   " +
                 "    CASE WHEN ISNULL(RTRIM(OPERATING_ROOM_NO), '-1') = '-1' THEN  T.DEPT_NAME  ELSE  T.DEPT_NAME  END AS OPERATING_DEPT_NAME,  CASE WHEN A.EMERGENCY_INDICATOR = 0 AND" +
-                "  A.SCHEDULED_DATE_TIME IS NOT NULL AND              CONVERT(VARCHAR(10), P.ADMISSION_DATE_TIME, 121) =  CONVERT(VARCHAR(10), A.SCHEDULED_DATE_TIME, 121) THEN  1  ELSE   0  END AS DAYTIME_OPERATION,SS.*,MM.BED_LABEL FROM [155.155.100.107].docare.dbo.MED_OPERATION_SCHEDULE A" +
-                "  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_PAT_MASTER_INDEX B    ON A.PATIENT_ID = B.PATIENT_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS D   ON A.SURGEON = D.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS E    ON A.ANESTHESIA_DOCTOR = E.USER_ID  LEFT OUTER JOIN" +
+                "  A.SCHEDULED_DATE_TIME IS NOT NULL AND              CONVERT(VARCHAR(10), P.ADMISSION_DATE_TIME, 121) =  CONVERT(VARCHAR(10), A.SCHEDULED_DATE_TIME, 121) THEN  1  ELSE   0  END AS DAYTIME_OPERATION,SS.*,MM.BED_LABEL FROM [155.155.100.107].docare.dbo.MED_OPERATION_SCHEDULE A (nolock)" +
+                "  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_PAT_MASTER_INDEX B (nolock)   ON A.PATIENT_ID = B.PATIENT_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS D   ON A.SURGEON = D.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS E    ON A.ANESTHESIA_DOCTOR = E.USER_ID  LEFT OUTER JOIN" +
                 " [155.155.100.107].docare.dbo.MED_HIS_USERS F    ON A.ANESTHESIA_ASSISTANT = F.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS G    ON A.FIRST_OPERATION_NURSE = G.USER_ID  LEFT OUTER JOIN" +
                 " [155.155.100.107].docare.dbo.MED_HIS_USERS H    ON A.SECOND_OPERATION_NURSE = H.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS I   ON A.FIRST_SUPPLY_NURSE = I.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS J  ON A.SECOND_SUPPLY_NURSE = J.USER_ID  LEFT " +
                 "OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS K    ON A.THIRD_SUPPLY_NURSE = K.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS L    ON A.FIRST_ASSISTANT = L.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS M    ON A.SECOND_ASSISTANT = M.USER_ID" +
@@ -482,7 +482,7 @@ namespace SendOperationPlan
             }
 
 
-            dataGridView1.DataSource = operatInfos;
+            //dataGridView1.DataSource = operatInfos;
 
             
         }
@@ -510,7 +510,7 @@ namespace SendOperationPlan
             string datetime = dateTime.ToString("yyyy-MM-dd");
             string datetime2 = dateTime.ToString("yyyy年MM月dd日");
 
-
+            /*
             string sql = "SELECT A.*, B.NAME AS PAT_NAME, YEAR(getdate()) - YEAR(B.DATE_OF_BIRTH) AS PAT_AGE, B.INP_NO, B.SEX,ISNULL(rtrim(L.USER_NAME), " +
                 "A.FIRST_ASSISTANT) AS FIRST_ASSISTANT_NAME, ISNULL(rtrim(M.USER_NAME), A.SECOND_ASSISTANT) AS SECOND_ASSISTANT_NAME, ISNULL(rtrim(N.USER_NAME), A.THIRD_ASSISTANT) AS THIRD_ASSISTANT_NAME," +
                 "ISNULL(D.USER_NAME, A.SURGEON) AS SURGEON_NAME,  E.USER_NAME AS ANESTHESIA_DOCTOR_NAME, F.USER_NAME AS ANESTHESIA_ASSISTANT_NAME,  O.USER_NAME AS ANESTHESIA_ASSISTANT_NAME_TWO," +
@@ -528,24 +528,31 @@ namespace SendOperationPlan
                 "   AND A.OPERATING_ROOM = @OperatingRoom   AND NOT A.OPERATING_ROOM_NO IS NULL   AND A.STATE IN (0,1,2,3) ORDER BY ISNULL((SELECT BED_ID   FROM [155.155.100.107].docare.dbo.MED_OPERATING_ROOM   WHERE A.OPERATING_ROOM_NO = ROOM_NO),   0),   A.SEQUENCE";
 
 
-
+            */
 
             //住院手术室
-            SqlParameter[] parameters = {
-            new SqlParameter("@OperatingRoom", "1032"),
-            new SqlParameter("@SheduleDateTime", datetime)
-            };
+            //SqlParameter[] parameters = {
+            //new SqlParameter("@OperatingRoom", "1032"),
+            //new SqlParameter("@SheduleDateTime", datetime)
+            //};
 
             //日间手术室
-            SqlParameter[] parameters2 = {
-            new SqlParameter("@OperatingRoom", "2020"),
+            //SqlParameter[] parameters2 = {
+            //new SqlParameter("@OperatingRoom", "2020"),
+            //new SqlParameter("@SheduleDateTime", datetime)
+            //};
+            string sql = "select CASE WHEN ISNULL(RTRIM(a.OPERATING_ROOM_NO), '-1') = '-1' THEN  T.DEPT_NAME  ELSE  T.DEPT_NAME  END AS OPERATING_DEPT_NAME,DATEDIFF(YEAR,b.DATE_OF_BIRTH , GETDATE()) as PAT_AGE, a.OPERATION_SCALE,a.OPERATING_ROOM_NO,  a.BED_NO,a.PATIENT_ID,a.SCHEDULED_DATE_TIME,a.ANESTHESIA_METHOD,a.OPERATION_NAME,a.SURGEON,b.INP_NO,b.NAME as PAT_NAME,b.SEX as PAT_SEX,a.OPERATING_ROOM ,MM.BED_LABEL,ISNULL(D.USER_NAME, a.SURGEON) as SURGEON_NAME  from [155.155.100.107].docare.dbo.MED_OPERATION_MASTER a (nolock)" +
+                "\r\nleft OUTER join  [155.155.100.107].docare.dbo.MED_PAT_MASTER_INDEX b  (nolock) on a.PATIENT_ID=b.PATIENT_ID\r\nleft OUTER join  [155.155.100.107].docare.dbo.MED_OPERATING_ROOM MM on  CONVERT(NVARCHAR(16), MM.BED_ID)=isnull(a.OPERATING_ROOM_NO,'-80')\r\nLEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS D " +
+                "  ON a.SURGEON = D.USER_ID\r\n   LEFT OUTER JOIN  [155.155.100.107].docare.dbo.MED_DEPT_DICT T    ON a.OPERATING_DEPT = T.DEPT_CODE   where   a.OPER_STATUS>0  and  (CONVERT(VARCHAR, a.SCHEDULED_DATE_TIME, 23)) = @SheduleDateTime";
+            
+            SqlParameter[] parameters = {
+    
             new SqlParameter("@SheduleDateTime", datetime)
             };
             DataTable dt = DbHelper.GetData(sql, CommandType.Text, parameters);
+            //DataTable dt2 = DbHelper.GetData(sql, CommandType.Text, parameters2);
 
-            DataTable dt2 = DbHelper.GetData(sql, CommandType.Text, parameters2);
-
-            dt.Merge(dt2);
+            //dt.Merge(dt2);
 
             if (dt.Rows.Count == 0)
             {
@@ -564,10 +571,10 @@ namespace SendOperationPlan
                 {
                     operatingRoomNo = dr["OPERATING_ROOM_NO"].ToString(),
                     operatingRoomNoName = dr["BED_LABEL"].ToString(),
-                    sequence = dr["SEQUENCE"].ToString(),
+                    //sequence = dr["SEQUENCE"].ToString(),
 
                     sstime = resulttime,
-                    wardCodeName = dr["WARD_CODE_NAME"].ToString(),
+                   // wardCodeName = dr["WARD_CODE_NAME"].ToString(),
                     operatdeptName = dr["OPERATING_DEPT_NAME"].ToString(),
                     inpNo = dr["INP_NO"].ToString(),
                     patientId = dr["PATIENT_ID"].ToString(),
@@ -575,25 +582,24 @@ namespace SendOperationPlan
                     patAge = dr["PAT_AGE"].ToString(),
                     surgeon = dr["SURGEON"].ToString(),
                     surgeonName = dr["SURGEON_NAME"].ToString(),
-                    anesthesiaDoctor = dr["ANESTHESIA_DOCTOR"].ToString(),
-                    anesthesiaDoctorName = dr["ANESTHESIA_DOCTOR_NAME"].ToString(),
+                    //anesthesiaDoctor = dr["ANESTHESIA_DOCTOR"].ToString(),
+                    //anesthesiaDoctorName = dr["ANESTHESIA_DOCTOR_NAME"].ToString(),
                     anesthesiaMethod = dr["ANESTHESIA_METHOD"].ToString(),
-                    operation = dr["OPERATION"].ToString(),
+                    operation = dr["OPERATION_NAME"].ToString(),
                     operationScale = dr["OPERATION_SCALE"].ToString(),
-                    scheduleType = dr["SCHEDULE_TYPE"].ToString(),
-                    notesOnOperation = dr["NOTES_ON_OPERATION"].ToString(),
-                    firstAssistant = dr["FIRST_ASSISTANT"].ToString(),
-                    firstAssistantName = dr["FIRST_ASSISTANT_NAME"].ToString(),
+                   // scheduleType = dr["SCHEDULE_TYPE"].ToString(),
+                    //notesOnOperation = dr["NOTES_ON_OPERATION"].ToString(),
+                    //firstAssistant = dr["FIRST_ASSISTANT"].ToString(),
+                    //firstAssistantName = dr["FIRST_ASSISTANT_NAME"].ToString(),
                     bedNo = dr["BED_NO"].ToString(),
                     operatingRoom = dr["OPERATING_ROOM"].ToString(),
-                    sex = dr["SEX"].ToString(),
-                    state = dr["STATE"].ToString().Trim()
+                    sex = dr["PAT_SEX"].ToString(),
+                    //state = dr["STATE"].ToString().Trim()
                 };
 
-                if (info.state == "3")
-                {
+                
                     operatInfos.Add(info);
-                }
+                
                 
 
             }
@@ -606,16 +612,13 @@ namespace SendOperationPlan
             }
 
             string patidstr= "'" + string.Join("','", operatInfos.Select(x => x.patientId)) + "'";
-            string inpnostr = "'" + string.Join("','", operatInfos.Select(x => x.inpNo)) + "'";
+            //string inpnostr = "'" + string.Join("','", operatInfos.Select(x => x.inpNo)) + "'";
             string bednostr = "'" + string.Join("','", operatInfos.Select(x => x.bedNo)) + "'";
 
-            string sqll = "SELECT A.BED_NO,A.PATIENT_ID,A.SCHEDULED_DATE_TIME,A.ANESTHESIA_METHOD,A.OPERATION_NAME,A.SURGEON  from [155.155.100.107].docare.dbo.MED_OPERATION_MASTER A WHERE  ( CONVERT(VARCHAR, SCHEDULED_DATE_TIME, 23) < '" + datetime + "'  )  \r\nAND OPER_STATUS NOT IN (-80) and OPER_STATUS>0  AND A.PATIENT_ID IN (" + patidstr+")  AND A.BED_NO IN ("+bednostr+")  ORDER BY A.OPERATING_ROOM_NO ASC,A.SEQUENCE ASC";
+            string sqll = "SELECT A.BED_NO,A.PATIENT_ID,A.SCHEDULED_DATE_TIME,A.ANESTHESIA_METHOD,A.OPERATION_NAME,A.SURGEON  from [155.155.100.107].docare.dbo.MED_OPERATION_MASTER A with(nolock) WHERE  ( CONVERT(VARCHAR, SCHEDULED_DATE_TIME, 23) < '" + datetime + "'  )  \r\nAND OPER_STATUS NOT IN (-80) and OPER_STATUS>0  AND A.PATIENT_ID IN (" + patidstr+")  AND A.BED_NO IN ("+bednostr+")  ORDER BY A.OPERATING_ROOM_NO ASC,A.SEQUENCE ASC";
 
 
-            SqlParameter[] parameters3 = {
-            new SqlParameter("@OperatingRoom", "1032"),
-            new SqlParameter("@SheduleDateTime", datetime)
-            };
+            SqlParameter[] parameters3 = {};
             DataTable dt3 = DbHelper.GetData(sqll, CommandType.Text, parameters3);
 
             List<repeatoperation> operatInfos2 = new List<repeatoperation>();
@@ -667,7 +670,7 @@ namespace SendOperationPlan
 
 
                     sendtext += $"<font color=\"info\">\r\n ";
-                    sendtext += $"【" + (count++) + "】手术间号:" + info.operatingRoomNoName + "|第" + info.sequence + "台|" + info.patName + "、" + info.sex + "、" + info.patAge + "岁|" + info.inpNo + "(住院号)|" + info.operatdeptName +"|" + info.operation + "|" + info.anesthesiaMethod + "|" + info.surgeonName+"|"+ datetime2;
+                    sendtext += $"【" + (count++) + "】手术间号:" + info.operatingRoomNoName + "|" + info.patName + "、" + info.sex + "、" + info.patAge + "岁|" + info.inpNo + "(住院号)|" + info.operatdeptName +"|" + info.operation + "|" + info.anesthesiaMethod + "|" + info.surgeonName+"|"+ datetime2;
                     sendtext += $"</font>  ";
      
                     sendtext += $"<font color=\"warning\">  ";
