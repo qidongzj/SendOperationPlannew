@@ -849,7 +849,7 @@ namespace SendOperationPlan
                     {
                         //下午三点推送第二天的手术排班
                         
-                        SendMessage(true, true);
+                        SendMessage(true, false);
                     }
                     if (this._timer.Interval == 90 * 1000)
                     {
@@ -871,13 +871,13 @@ namespace SendOperationPlan
                     if (checkBox1.Checked)//
                     {
                         //上午7点推送当天的手术排班
-                        SendMessage(false, true);
+                        SendMessage(false, false);
 
                     }
                     if (checkBox2.Checked)
                     {
                         //推送给管理员 前一天的手术排班消息有做多次手术的患者 推送给管理员
-                        SendlastdayMessage(true);
+                        SendlastdayMessage(false);
                     }
                     if (this._timer2.Interval == 100 * 1000)
                     {

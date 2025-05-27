@@ -563,19 +563,19 @@ namespace SendOperationPlan
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
                     if (data.errmsg == "ok")
                     {
-                        foreach (WjzInfo info2 in wjzInfosmz)
-                        {
-                            info2.是否推送成功 = "成功";
-                            info2.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        }
+                        //foreach (WjzInfo info2 in wjzInfosmz)
+                        //{
+                            info.是否推送成功 = "成功";
+                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        //}
                     }
                     else
                     {
-                        foreach (WjzInfo info2 in wjzInfosmz)
-                        {
-                            info2.是否推送成功 = "失败";
-                            info2.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        }
+                        //foreach (WjzInfo info2 in wjzInfosmz)
+                        //{
+                            info.是否推送成功 = "失败";
+                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        //}
                     }
                     string xxx = string.Empty;
                     if (istest)
@@ -724,19 +724,19 @@ namespace SendOperationPlan
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
                     if (data.errmsg == "ok")
                     {
-                        foreach (WjzInfo info2 in wjzInfoszy)
-                        {
-                            info2.是否推送成功 = "成功";
-                            info2.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        }
+                        //foreach (WjzInfo info2 in wjzInfoszy)
+                        //{
+                            info.是否推送成功 = "成功";
+                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        //}
                     }
                     else
                     {
-                        foreach (WjzInfo info2 in wjzInfoszy)
-                        {
-                            info2.是否推送成功 = "失败";
-                            info2.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        }
+                        //foreach (WjzInfo info2 in wjzInfoszy)
+                        //{
+                            info.是否推送成功 = "失败";
+                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        //}
                     }
                     string xxx = string.Empty;
                     if (istest)
