@@ -301,27 +301,26 @@ namespace SendOperationPlan
                 "  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS N    ON A.THIRD_ASSISTANT = N.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_DEPT_DICT T    ON A.OPERATING_DEPT = T.DEPT_CODE  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS O    ON A.SECOND_ANESTHESIA_ASSISTANT = O.USER_ID" +
                 "  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_PATS_IN_HOSPITAL P    ON A.PATIENT_ID = P.PATIENT_ID   AND A.VISIT_ID = P.VISIT_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_DEPT_DICT Q    ON P.WARD_CODE = Q.DEPT_CODE  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_SCHEDULED_OPERATION_NAME SS ON A.PATIENT_ID =SS.PATIENT_ID " +
                 " LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_SCHEDULED_OPERATION_NAME TT on SS.PATIENT_ID =TT.PATIENT_ID and SS.RESERVED1< TT.RESERVED1  left outer join [155.155.100.107].docare.dbo.MED_OPERATING_ROOM MM on  CONVERT(NVARCHAR(16), MM.BED_ID)=isnull(A.OPERATING_ROOM_NO,'-80')  WHERE TT.PATIENT_ID is NULL and  (CONVERT(VARCHAR, A.SCHEDULED_DATE_TIME, 23) =  @SheduleDateTime )" +
-                "   AND A.OPERATING_ROOM = @OperatingRoom   AND NOT A.OPERATING_ROOM_NO IS NULL   AND A.STATE IN (0,1,2,3) ORDER BY ISNULL((SELECT BED_ID   FROM [155.155.100.107].docare.dbo.MED_OPERATING_ROOM   WHERE A.OPERATING_ROOM_NO = ROOM_NO),   0),   A.SEQUENCE";
+                "   AND A.OPERATING_ROOM in ('1032','2020')   AND NOT A.OPERATING_ROOM_NO IS NULL   AND A.STATE IN (0,1,2,3) ORDER BY ISNULL((SELECT BED_ID   FROM [155.155.100.107].docare.dbo.MED_OPERATING_ROOM   WHERE A.OPERATING_ROOM_NO = ROOM_NO),   0),   A.SEQUENCE";
 
 
 
 
             //住院手术室
             SqlParameter[] parameters = {
-            new SqlParameter("@OperatingRoom", "1032"),
             new SqlParameter("@SheduleDateTime", datetime)
             };
 
-            //日间手术室
-            SqlParameter[] parameters2 = {
-            new SqlParameter("@OperatingRoom", "2020"),
-            new SqlParameter("@SheduleDateTime", datetime)
-            };
+            ////日间手术室
+            //SqlParameter[] parameters2 = {
+            //new SqlParameter("@OperatingRoom", "2020"),
+            //new SqlParameter("@SheduleDateTime", datetime)
+            //};
             DataTable dt = DbHelper.GetData(sql, CommandType.Text, parameters);
 
-            DataTable dt2 = DbHelper.GetData(sql, CommandType.Text, parameters2);
+           // DataTable dt2 = DbHelper.GetData(sql, CommandType.Text, parameters2);
 
-            dt.Merge(dt2);
+            //dt.Merge(dt2);
 
             if (dt.Rows.Count == 0)
             {
