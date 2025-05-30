@@ -718,7 +718,7 @@ namespace SendOperationPlan
                     else
                     {
                         //正式
-                        msg = SendTextMessageMarkdown(sendUrl, token, info.Sjkdysdm, content);
+                        msg = SendTextMessageMarkdown(sendUrl, token, info.Dfysdm, content);
                     }
 
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
@@ -808,7 +808,7 @@ namespace SendOperationPlan
         private void timer1_Tick(object sender, EventArgs e)
         {
             this.button1.Enabled = false;
-            SendMessage(true);
+            SendMessage(false);
             this.button1.Enabled = true;
         }
 
