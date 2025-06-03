@@ -483,7 +483,7 @@ namespace SendOperationPlan
 
                 foreach (WjzInfo info in wjzInfosmz)
                 {
-                    string accessToken = GetAccessToken();
+                    //string accessToken = GetAccessToken();
                     string content = "";
                     //string content1 = "";
                     //string content2 = "";
@@ -556,8 +556,16 @@ namespace SendOperationPlan
                     }
                     else
                     {
-                        //正式
-                        msg = SendTextMessageMarkdown(sendUrl, token, info.Sjkdysdm, content);
+                        if (!string.IsNullOrEmpty(info.Sjkdysdm?.ToString().Trim()))
+                        {
+                            //正式
+                            msg = SendTextMessageMarkdown(sendUrl, token, info.Sjkdysdm?.ToString().Trim(), content);
+                        }
+                        else 
+                        {
+                            //开单医生代码为空时，使用配置的测试用户
+                            msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
+                        }
                     }
 
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
@@ -643,7 +651,7 @@ namespace SendOperationPlan
 
                 foreach (WjzInfo info in wjzInfoszy)
                 {
-                    string accessToken = GetAccessToken();
+                    //string accessToken = GetAccessToken();
                     string content = "";
                     //string content1 = "";
                     //string content2 = "";
@@ -717,8 +725,18 @@ namespace SendOperationPlan
                     }
                     else
                     {
+                        if (!string.IsNullOrEmpty(info.Dfysdm?.ToString().Trim()))
+                        {
+                            //正式
+                            msg = SendTextMessageMarkdown(sendUrl, token, info.Dfysdm?.ToString().Trim(), content);
+                        }
+                        else
+                        {
+                            //开单医生代码为空时，使用配置的测试用户
+                            msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
+                        }
                         //正式
-                        msg = SendTextMessageMarkdown(sendUrl, token, info.Dfysdm, content);
+                        //msg = SendTextMessageMarkdown(sendUrl, token, info.Dfysdm?.ToString().Trim(), content);
                     }
 
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
@@ -745,7 +763,7 @@ namespace SendOperationPlan
                     }
                     else
                     {
-                        xxx = info.Dfysdm;
+                        xxx = info.Dfysdm?.ToString().Trim();
                     }
 
                     WriteLog("url:" + sendUrl + "    \r\n  token:" + token + "  \r\n userid:" + xxx + " \r\n  sendmessage:" + content + " \r\n  回参:" + msg);
