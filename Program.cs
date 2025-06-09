@@ -16,8 +16,8 @@ namespace SendOperationPlan
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormWjz());
-            //Application.Run(new Form1());
+            //Application.Run(new FormWjz());
+            Application.Run(new Form1());
         }
     }
 }

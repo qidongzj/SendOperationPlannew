@@ -481,8 +481,19 @@ namespace SendOperationPlan
                 WriteLog("url:" + sendUrl + "    \r\n  token:" + token + "  \r\n userid:" + xxx + " \r\n  sendmessage:" + sendtext + " \r\n  回参:" + msg);
             }
 
-
-            //dataGridView1.DataSource = operatInfos;
+            if (dataGridView1.InvokeRequired)
+            {
+                dataGridView1.BeginInvoke(new Action(() =>
+                {
+                    dataGridView1.DataSource = operatInfos;
+                    
+                }));
+            }
+            else 
+            {
+                dataGridView1.DataSource = operatInfos;
+            }
+            
 
             
         }
