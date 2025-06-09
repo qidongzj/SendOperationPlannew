@@ -569,7 +569,7 @@ namespace SendOperationPlan
                     }
 
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
-                    if (data.errmsg == "ok")
+                    if (data.errmsg == "ok"  || data.errcode== 81013)//81013 表示这个患者没有企业微信里注册
                     {
                         //foreach (WjzInfo info2 in wjzInfosmz)
                         //{
@@ -740,7 +740,7 @@ namespace SendOperationPlan
                     }
 
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
-                    if (data.errmsg == "ok")
+                    if (data.errmsg == "ok" || data.errcode == 81013)
                     {
                         //foreach (WjzInfo info2 in wjzInfoszy)
                         //{
