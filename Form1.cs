@@ -435,7 +435,7 @@ namespace SendOperationPlan
                 sendtext += $"日期：<font color=\"warning\">{datetime2}</font>  \n";
                 //sendtext += $"时间：<font color=\"warning\">{infos[0].sstime}</font>  \r\n";
                 sendtext += $" \r\n";
-                sendtext += $"请合理安排时间准时参加手术!";
+                sendtext += $"具体安排情况可能因急诊手术会有调整，请各位医生理解配合!";
                 sendtext += $" \r\n";
 
                 string token = GetAccessToken();
