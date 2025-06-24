@@ -39,10 +39,12 @@ namespace SendOperationPlan
                     using (SqlCommand command = new SqlCommand(sqlQuery, connection))
                     {
                         command.CommandType = commandType;
+                        command.CommandTimeout = 180; // 设置命令超时时间//3分钟
 
                         // 添加参数
                         if (parameters != null)
                         {
+                           
                             command.Parameters.AddRange(parameters);
                         }
 
@@ -78,6 +80,27 @@ namespace SendOperationPlan
                         cmd.Parameters.AddRange(parameters);
                     }
                     return cmd.ExecuteNonQuery(); // 返回受影响行数
+                }
+            }
+        }
+
+
+        public static async Task<DataTable> QueryDataAsync(string sqlQuery, SqlParameter[] parameters = null)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                await conn.OpenAsync();
+                using (SqlCommand cmd = new SqlCommand(sqlQuery, conn))
+                {
+                    cmd.CommandTimeout = 180; // 超时时间设为3分钟
+                    if (parameters != null) cmd.Parameters.AddRange(parameters);
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        DataTable dt = new DataTable();
+                        dt.Load(reader); // 异步加载数据到DataTable
+                        return dt;
+                    }
                 }
             }
         }
