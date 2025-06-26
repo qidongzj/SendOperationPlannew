@@ -465,25 +465,53 @@ namespace SendOperationPlan
 
                     string datetime2 = DateTime.Now.ToString("yyyy年MM月dd日");
 
+                    //string sendtext = string.Empty;
+                    //sendtext = $"`患者七日内重复入院的列表`\r\n" +
+                    //           $"**事项详情:**  \r\n" +
+                    //           $"<font color=\"info\"> \r\n";
+                    //int count = 1;
+                    //foreach (Result info in resultlist)
+                    //{
+                    //    sendtext += $"【" + (count++) + "】" + info.HZXM + "," + info.SEX.Trim() + "," + info.XSNL +","+info.YBMC+ "  \r\n";
+                    //    sendtext += $"上次出院:"+info.SCZYH+","+info.CYKSMC+"," + info.CYRQ.ToString("D")+""+ info.CYRQ.Hour+"时, "+ info.CYZDMC+ ", 住院天数:"+info.ZYTS + "  \r\n";
+                    //    sendtext += $"本次入院:" + info.BCZYH + "," + info.RYKSMC + "," + info.RYRQ.ToString("D") + "" + info.RYRQ.Hour + "时, " + info.RYZDMC  + "  \r\n";
+                    //    sendtext += "\r\n";
+                    //}
+
+                    //sendtext += $"</font>";
+                    //sendtext += $" \r\n";
+                    //sendtext += $"推送日期：<font color=\"warning\">{datetime2}</font>  \n";
+
+                    //sendtext += $" \r\n";
+
+
+
                     string sendtext = string.Empty;
-                    sendtext = $"`患者七日内重复入院的列表`\r\n" +
-                               $"**事项详情:**  \r\n" +
-                               $"<font color=\"info\"> \r\n";
+                    sendtext += $"`患者七日内重复入院的列表`\r\n";
+                    sendtext += $"**事项详情:**  \r\n";
+                    sendtext += $"<font color=\"info\"> \r\n";
                     int count = 1;
                     foreach (Result info in resultlist)
                     {
-                        sendtext += $"【" + (count++) + "】" + info.HZXM + "," + info.SEX.Trim() + "," + info.XSNL +","+info.YBMC+ "  \r\n";
-                        sendtext += $"上次出院:"+info.SCZYH+","+info.CYKSMC+"," + info.CYRQ.ToString("D")+""+ info.CYRQ.Hour+"时, "+ info.CYZDMC+ ", 住院天数:"+info.ZYTS + "  \r\n";
-                        sendtext += $"本次入院:" + info.BCZYH + "," + info.RYKSMC + "," + info.RYRQ.ToString("D") + "" + info.RYRQ.Hour + "时, " + info.RYZDMC  + "  \r\n";
+
+                        sendtext += $"【" + (count++) + "】" + info.HZXM + "," + info.SEX.Trim() + "," + info.XSNL + "," + info.YBMC + "  \r\n";
+                        sendtext += $"上次出院:" + info.SCZYH + "," + info.CYKSMC + "," + info.CYRQ.ToString("D") + " " + info.CYRQ.Hour + "时, " + info.CYZDMC + ", 住院天数:" + info.ZYTS + "  \r\n";
+                        sendtext += $"本次入院:" + info.BCZYH + "," + info.RYKSMC + "," + info.RYRQ.ToString("D") + " " + info.RYRQ.Hour + "时, " + info.RYZDMC + "  \r\n";
                         sendtext += "\r\n";
                     }
 
-                    sendtext += $"</font>";
-                    sendtext += $" \r\n";
+                    sendtext += $"</font>     \r\n";
+                    //sendtext += $" \r\n";
                     sendtext += $"推送日期：<font color=\"warning\">{datetime2}</font>  \n";
-                 
+                    //sendtext += $"时间：<font color=\"warning\">{infos[0].sstime}</font>  \r\n";
                     sendtext += $" \r\n";
-                    
+                    //sendtext += $"具体安排情况可能因急诊手术会有调整，请各位医生理解配合!";
+                    //sendtext += $" \r\n";
+
+
+
+
+
                     WriteLog($"推送入参: 工号： {userid}, 入参 {sendtext}");
                     string result = SendTextMessageMarkdown(sendUrl, accessToken, userid, sendtext);
                     WriteLog($"推送结果: {result}");
