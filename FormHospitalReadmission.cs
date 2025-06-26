@@ -316,7 +316,7 @@ namespace SendOperationPlan
 
 
 
-                string sql2= "select   *  from CISDB.dbo.INP_BRSYK a(nolock) where RYRQ>= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (1 + abc) + "), 0)  and  RYRQ < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (0 + abc) + "), 0)   and BRZT !=9  order by PATID,a.RYRQ"; //and PATID in ('" + string.Join("','",patidlist) + "')
+                string sql2= "select   *  from CISDB.dbo.INP_BRSYK a(nolock) where RYRQ>= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (1 + abc) + "), 0)  and  RYRQ < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (0 + abc) + "), 0) and BQDM!='124'  and BRZT !=9  order by PATID,a.RYRQ"; //and PATID in ('" + string.Join("','",patidlist) + "')
                 DataTable dt2 = DbHelper.GetData(sql2, CommandType.Text, null);
                 if (dt2 == null || dt2.Rows.Count == 0)
                 {
@@ -335,7 +335,7 @@ namespace SendOperationPlan
                             patidlist2.Add(row["PATID"].ToString());
                         }
                     }
-                    string sql3 = "select *  from CISDB.dbo.INP_BRSYK a(nolock) where CYRQ>= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (8 + abc) + "), 0)  and  CYRQ < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-"+ (1 + abc) +"), 0)   and BRZT !=9 and PATID in ('" + string.Join("','", patidlist2) + "') order by PATID asc,a.RYRQ desc";
+                    string sql3 = "select *  from CISDB.dbo.INP_BRSYK a(nolock) where CYRQ>= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (8 + abc) + "), 0)  and  CYRQ < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-"+ (1 + abc) + "), 0)   and BRZT !=9 and BQDM!='124' and PATID in ('" + string.Join("','", patidlist2) + "') order by PATID asc,a.RYRQ desc";
 
                     DataTable dt3 = DbHelper.GetData(sql3, CommandType.Text, null);
 
