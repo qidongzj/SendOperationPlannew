@@ -22,6 +22,8 @@ namespace SendOperationPlan
 
         public string BLH { get; set; } // 病历号
 
+       
+
         public string HZXM { get; set; } // 患者姓名    
 
         public string XSNL { get; set; } // 年龄
@@ -30,6 +32,7 @@ namespace SendOperationPlan
 
         public string SFZH { get; set; } // 身份证号
 
+      
         public string YBMC { get; set; } // 医保名称    
 
         public string KSDM { get; set; } // 科室代码
@@ -42,9 +45,9 @@ namespace SendOperationPlan
 
         public string YSXM { get; set; } // 医生名称
 
-        public string ZDDM { get; set; } // 诊断代码
+        public string RYZDMC { get; set; } // 入院诊断
 
-        public string ZDMC { get; set; } // 诊断名称            
+        public string CYZDMC { get; set; } // 出院诊断            
 
 
     }
@@ -71,5 +74,15 @@ namespace SendOperationPlan
         public string RYKSMC { get; set; } // 入院科室
 
         public DateTime RYRQ { get; set; } // 入院日期
+
+        public string SCZYH { get; set; } // 上次住院号
+
+        public string BCZYH { get; set; } // 本次住院号
+
+        public string RYZDMC { get; set; } // 入院诊断
+
+        public string CYZDMC { get; set; } // 出院诊断
+
+        public int ZYTS { get; set; } // 住院天数
     } 
 }

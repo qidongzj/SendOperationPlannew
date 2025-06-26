@@ -370,8 +370,11 @@ namespace SendOperationPlan
                         brsyk.XSNL = row["XSNL"].ToString();
                         brsyk.SFZH = row["SFZH"].ToString();
                         brsyk.YBMC = row["YBMC"].ToString();
-                        brsyk.ZDDM = row["ZDDM"].ToString();
-                        brsyk.ZDMC = row["ZDMC"].ToString();
+                        brsyk.RYZDMC = row["RYZDMC"].ToString();
+                        brsyk.CYZDMC = row["CYZDMC"].ToString();
+
+
+                        brsyk.BLH=row["BLH"].ToString();
                         daylist.Add(brsyk);
                     }
 
@@ -401,8 +404,12 @@ namespace SendOperationPlan
                         brsyk.XSNL = row["XSNL"].ToString();
                         brsyk.SFZH = row["SFZH"].ToString();
                         brsyk.YBMC = row["YBMC"].ToString();
-                        brsyk.ZDDM = row["ZDDM"].ToString();
-                        brsyk.ZDMC = row["ZDMC"].ToString();
+                    //brsyk.ZDDM = row["ZDDM"].ToString();
+                    //brsyk.ZDMC = row["ZDMC"].ToString();
+                        brsyk.RYZDMC = row["RYZDMC"].ToString();
+                        brsyk.CYZDMC = row["CYZDMC"].ToString();
+                        brsyk.BLH = row["BLH"].ToString();
+                    
                         daysevenlist.Add(brsyk);
                     }
 
@@ -428,7 +435,12 @@ namespace SendOperationPlan
                                     SFZH = info.SFZH,
                                     YBMC = info.YBMC,
                                     CYKSMC=info2.KSMC,
-                                    RYKSMC=info.KSMC
+                                    RYKSMC=info.KSMC,
+                                    SCZYH=info2.BLH,
+                                    CYZDMC = info2.CYZDMC,
+                                    BCZYH =info.BLH,
+                                    RYZDMC = info.RYZDMC,
+                                    ZYTS = Math.Abs((info2.CYRQ.Value.Date - info2.RYRQ.Value.Date).Days),// (info2.CYRQ - info2.RYRQ) + 1, // 住院天数
                                 });
 
                             }
@@ -444,7 +456,7 @@ namespace SendOperationPlan
                         WriteErrorLog("获取企业微信AccessToken失败");
                         return;
                     }
-                    string content = "";
+                    //string content = "";
                     string userid = "1774|2382|3024"; // 
                     if (istest)
                     {
@@ -454,39 +466,24 @@ namespace SendOperationPlan
                     string datetime2 = DateTime.Now.ToString("yyyy年MM月dd日");
 
                     string sendtext = string.Empty;
-                    sendtext += $"`患者七日内重复入院的列表`\r\n";
-                    sendtext += $"**事项详情:**  \r\n";
-                    sendtext += $"<font color=\"info\"> \r\n";
+                    sendtext = $"`患者七日内重复入院的列表`\r\n" +
+                               $"**事项详情:**  \r\n" +
+                               $"<font color=\"info\"> \r\n";
                     int count = 1;
                     foreach (Result info in resultlist)
                     {
-
-                        //sendtext += $"【" + (count++) + "】" + info.HZXM + "|第" + info.sequence + "台|" + info.patName + "、" + info.sex + "、" + info.patAge + "岁|" + info.inpNo + "(住院号)|" + info.operatdeptName + "|" + info.operation + "|" + info.anesthesiaMethod + "|" + info.surgeonName; //+ "|" + info.sstime + "(手术时间)";
-                        sendtext += $"【" + (count++) + "】" + info.HZXM + "| " + info.SEX.Trim() + "| " + info.XSNL + "| " + info.SFZH + "[身份证]| " + info.YBMC + "| "+info.CYKSMC+"[出院科室]| " + info.CYRQ.ToString("f").Trim() + "[上次出院日期]| " +info.RYKSMC+"[入院科室]| "+ info.RYRQ.ToString("f").Trim() + "[本次入院日期]|";
-                        sendtext += "\r\n";
+                        sendtext += $"【" + (count++) + "】" + info.HZXM + "," + info.SEX.Trim() + "," + info.XSNL +","+info.YBMC+ "  \r\n";
+                        sendtext += $"上次出院:"+info.SCZYH+","+info.CYKSMC+"," + info.CYRQ.ToString("D")+""+ info.CYRQ.Hour+"时, "+ info.CYZDMC+ ", 住院天数:"+info.ZYTS + "  \r\n";
+                        sendtext += $"本次入院:" + info.BCZYH + "," + info.RYKSMC + "," + info.RYRQ.ToString("D") + "" + info.RYRQ.Hour + "时, " + info.RYZDMC  + "  \r\n";
                         sendtext += "\r\n";
                     }
 
-                    sendtext += $"</font>     \r\n";
+                    sendtext += $"</font>";
                     sendtext += $" \r\n";
                     sendtext += $"推送日期：<font color=\"warning\">{datetime2}</font>  \n";
-                    //sendtext += $"时间：<font color=\"warning\">{infos[0].sstime}</font>  \r\n";
+                 
                     sendtext += $" \r\n";
-                    //sendtext += $"具体安排情况可能因急诊手术会有调整，请各位医生理解配合!";
-                    //sendtext += $" \r\n";
-
-
-
-                    //foreach (DataRow row in dt2.Rows)
-                    //{
-                    //    content += $"患者姓名: {row["XM"]}，入院时间: {row["RYRQ"]}, 出院时间: {row["CYRQ"]}\r\n";
-                    //}
-
-
-
-
-
-
+                    
                     WriteLog($"推送入参: 工号： {userid}, 入参 {sendtext}");
                     string result = SendTextMessageMarkdown(sendUrl, accessToken, userid, sendtext);
                     WriteLog($"推送结果: {result}");
