@@ -136,6 +136,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormHospitalReadmission.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormHospitalReadmission.Designer.cs">
+      <DependentUpon>FormHospitalReadmission.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormWjz.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -148,6 +154,7 @@
     <Compile Include="FormZybz.Designer.cs">
       <DependentUpon>FormZybz.cs</DependentUpon>
     </Compile>
+    <Compile Include="INP_BRSYK.cs" />
     <Compile Include="OperatInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -161,6 +168,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormHospitalReadmission.resx">
+      <DependentUpon>FormHospitalReadmission.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormWjz.resx">
       <DependentUpon>FormWjz.cs</DependentUpon>

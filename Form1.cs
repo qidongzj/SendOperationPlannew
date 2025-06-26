@@ -408,8 +408,10 @@ namespace SendOperationPlan
                 }
             }
 
+
+
             //推送给所有人企业微信通知
-           // DateTime t1 = DateTime.Now;
+            // DateTime t1 = DateTime.Now;
             foreach (string userid in userids)
             {
                 List<OperatInfo> infos = operatInfos.FindAll(x => x.surgeon == userid || x.firstAssistant == userid || x.anesthesiaDoctor == userid).OrderBy(r => r.sstime).ToList();
@@ -792,6 +794,7 @@ namespace SendOperationPlan
         /// <param name="e"></param>
         private void timer1_Tick(object sender, EventArgs e)
         {
+            /*
             if (DateTime.Now.ToString("HH:mm") == "15:00" || DateTime.Now.ToString("HH:mm") == "15:01")
             {
                 if (isEnabled)
@@ -830,6 +833,7 @@ namespace SendOperationPlan
                     isEnabled = true;
                 }
             }
+            */
 
         }
 

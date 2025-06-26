@@ -1,0 +1,568 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using DocumentFormat.OpenXml.EMMA;
+using Newtonsoft.Json;
+using static ClosedXML.Excel.XLPredefinedFormat;
+using DateTime = System.DateTime;
+
+namespace SendOperationPlan
+{
+    public partial class FormHospitalReadmission : Form
+    {
+        private static string corpid = "wx908901486f530786";            // 企业微信后台获取
+        private static string corpsecret = "jOpxoJf1Z2HI5IuxCnGURQQTOiwLSjylQJW7YIsBfj4";    // 对应应用的密钥
+        private static string tokenUrl = $"https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={corpid}&corpsecret={corpsecret}";
+        private static string sendUrl = $"https://qyapi.weixin.qq.com/cgi-bin/message/send";  // 发送消息的URL
+        private System.Timers.Timer _timer2; // 每100秒检查
+        private bool IsEnable3 = false;
+        public FormHospitalReadmission()
+        {
+            InitializeComponent();
+        }
+
+        /// <summary>
+        /// 获取token
+        /// </summary>
+        /// <returns></returns>
+        public string GetAccessToken()
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                var response = client.GetAsync(tokenUrl).Result;
+                response.EnsureSuccessStatusCode();
+                dynamic result = JsonConvert.DeserializeObject(response.Content.ReadAsStringAsync().Result);
+                return result.access_token;  // 有效期7200秒，需缓存复用[3](@ref)
+            }
+        }
+
+        public string SendTextMessageMarkdown(string apiUrl, string accessToken, string userid, string content1)
+        {
+            //string apiUrl = "https://qyapi.weixin.qq.com/cgi-bin/message/send";
+            try
+            {
+                var message = new
+                {
+                    touser = userid,
+                    msgtype = "markdown",
+                    agentid = "1000024",
+                    markdown = new { content = content1 }
+                };
+
+                using (HttpClient client = new HttpClient())
+                {
+                    var content2 = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
+                    var response = client.PostAsync($"{apiUrl}?access_token={accessToken}", content2).Result;
+                    // Console.WriteLine(response.Content.ReadAsStringAsync().Result);  // 输出接口返回结果[4](@ref)
+                    //richTextBox1.Text = response.Content.ReadAsStringAsync().Result;
+                    return response.Content.ReadAsStringAsync().Result;
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteErrorLog("企业微信接口异常:" + ex.Message);
+                return ex.Message;
+            }
+        }
+
+        /// <summary>
+        /// 记录日志
+        /// </summary>
+        /// <param name="log"></param>
+        private void WriteErrorLog(string log)
+        {
+            //if (!LogEnabled) return;
+
+            if (!Directory.Exists(Path.Combine(Application.StartupPath, "log"))) return;
+            try
+            {
+                string logfile = Path.Combine(Application.StartupPath, "log\\ErrorMessage_" + DateTime.Now.ToString("yyyyMMdd") + ".log");
+                FileStream fs = new FileStream(logfile, FileMode.Append);
+                try
+                {
+                    StreamWriter sw = new StreamWriter(fs);
+                    try
+                    {
+                        sw.Write(string.Format("{0}\r\n{1}\r\n{2}\r\n",
+                                                   "--------------------------------------------------",
+                                                   DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                                                   log
+                                                   )
+                                     );
+                    }
+                    finally
+                    {
+                        sw.Close();
+                    }
+                }
+                finally
+                {
+                    fs.Close();
+                }
+            }
+            catch
+            { }
+        }
+
+
+        /// <summary>
+        /// 记录日志
+        /// </summary>
+        /// <param name="log"></param>
+        private void WriteLog(string log)
+        {
+            //if (!LogEnabled) return;
+
+            if (!Directory.Exists(Path.Combine(Application.StartupPath, "log"))) return;
+            try
+            {
+                string logfile = Path.Combine(Application.StartupPath, "log\\pushMessage_" + DateTime.Now.ToString("yyyyMMdd") + ".log");
+                FileStream fs = new FileStream(logfile, FileMode.Append);
+                try
+                {
+                    StreamWriter sw = new StreamWriter(fs);
+                    try
+                    {
+                        sw.Write(string.Format("{0}\r\n{1}\r\n{2}\r\n",
+                                                   "--------------------------------------------------",
+                                                   DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                                                   log
+                                                   )
+                                     );
+                    }
+                    finally
+                    {
+                        sw.Close();
+                    }
+                }
+                finally
+                {
+                    fs.Close();
+                }
+            }
+            catch
+            { }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="log"></param>
+        private void WriterepeatLog(string log)
+        {
+            //if (!LogEnabled) return;
+
+            if (!Directory.Exists(Path.Combine(Application.StartupPath, "log"))) return;
+            try
+            {
+                string logfile = Path.Combine(Application.StartupPath, "log\\pushrepeatMessage_" + DateTime.Now.ToString("yyyyMMdd") + ".log");
+                FileStream fs = new FileStream(logfile, FileMode.Append);
+                try
+                {
+                    StreamWriter sw = new StreamWriter(fs);
+                    try
+                    {
+                        sw.Write(string.Format("{0}\r\n{1}\r\n{2}\r\n",
+                                                   "--------------------------------------------------",
+                                                   DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                                                   log
+                                                   )
+                                     );
+                    }
+                    finally
+                    {
+                        sw.Close();
+                    }
+                }
+                finally
+                {
+                    fs.Close();
+                }
+            }
+            catch
+            { }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            // 获取路径（推荐AppDomain方式）
+            string path = AppDomain.CurrentDomain.BaseDirectory + "log";
+
+            // 验证路径是否存在
+            if (Directory.Exists(path))
+            {
+                // 打开资源管理器
+                Process.Start("explorer.exe", path);
+                //Console.WriteLine("路径已打开: " + path);
+            }
+            else
+            {
+                //Console.WriteLine("路径不存在！");
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            _timer2.Interval = 100000; // 每100秒检查
+            _timer2?.Start();
+
+
+
+
+            this.IsEnable3 = false; // 重置标志位
+
+            button3.Enabled = false;
+            button4.Enabled = true;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+
+            _timer2?.Stop();
+
+            button3.Enabled = true;
+            button4.Enabled = false;
+
+            this.IsEnable3 = false; // 重置标志位
+        }
+
+        private void FormHospitalReadmission_Load(object sender, EventArgs e)
+        {
+            this._timer2 = new System.Timers.Timer(100 * 1000); // 每100秒检查
+            this._timer2?.Start();
+
+            _timer2.Elapsed += (s, e1) =>
+            {
+                if (IsEnable3 || (e1.SignalTime.Hour == 7 && (e1.SignalTime.Minute == 0 || e1.SignalTime.Minute == 1)))
+                {
+
+
+                    if (checkBox2.Checked)
+                    {
+                        //早上7点推送给管理员 高洁 和我 ， (昨天入院的患者,前面7日内出院的)
+                        SendHospitalReadmissionMessage(false);
+                    }
+                    if (this._timer2.Interval == 100 * 1000)
+                    {
+                        _timer2.Stop(); // 停止定时器
+                        _timer2.Interval = TimeSpan.FromHours(24).TotalMilliseconds; // 重置为24小时
+                        _timer2.Start(); // 重新启动定时器
+                        IsEnable3 = true;
+                    }
+                }
+            };
+
+
+            //comboBox1.SelectedIndex = 0;
+            button3.Enabled = false;
+            button4.Enabled = true;
+        }
+
+
+
+        // 是否在7天内
+        public bool IsPaidWithin7Days(DateTime orderTime, DateTime paymentTime)
+        {
+            TimeSpan diff = orderTime > paymentTime
+                           ? orderTime - paymentTime
+                           : paymentTime - orderTime;
+            return diff.TotalSeconds <= 604800;
+        }
+
+        
+       // bool isValid = IsPaidWithin7Days(order, payment); // true（相差 518,399 秒）
+
+
+        /// <summary>
+        /// (昨天入院的患者,前面7日内出院的)
+        /// </summary>
+        /// <param name="istest"></param>
+
+        private void SendHospitalReadmissionMessage(bool istest)
+        {
+
+            int abc = 0;
+            if (istest) 
+            {
+                abc = comboBox1.SelectedItem == null ? 0 : Convert.ToInt32(comboBox1.SelectedItem);
+            }
+
+            //string sql = "select *  from CISDB.dbo.INP_BRSYK a(nolock) where RYRQ>= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-"+(8+abc) +"), 0)  and  RYRQ < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE() -"+ (0+abc)+"), 0)  and BRZT !=9 and PATID in\r\n(select PATID from CISDB.dbo.INP_BRSYK a(nolock) where  RYRQ>=DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (8 + abc) + "), 0) and  RYRQ < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (0 + abc) + "), 0)   and BRZT !=9  group by PATID  HAVING COUNT(*) > 1) \r\norder by PATID,a.RYRQ";
+            //DataTable dt = DbHelper.GetData(sql, CommandType.Text, null);
+            //if (dt == null || dt.Rows.Count == 0)
+            //{
+            //    WriteLog("没有七日重复办理出入院的患者");
+            //    return;
+            //}
+            //else
+            //{
+                //List<string> patidlist = new List<string>();
+                //foreach (DataRow row in dt.Rows)
+                //{
+                //    if (!patidlist.Contains(row["PATID"].ToString()))
+                //    {
+                //        patidlist.Add(row["PATID"].ToString());
+                //    }
+                //}
+
+
+
+                string sql2= "select   *  from CISDB.dbo.INP_BRSYK a(nolock) where RYRQ>= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (1 + abc) + "), 0)  and  RYRQ < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (0 + abc) + "), 0)   and BRZT !=9  order by PATID,a.RYRQ"; //and PATID in ('" + string.Join("','",patidlist) + "')
+                DataTable dt2 = DbHelper.GetData(sql2, CommandType.Text, null);
+                if (dt2 == null || dt2.Rows.Count == 0)
+                {
+                    WriteLog("没有七日重复办理出入院的患者1");
+                    return;
+                }
+                else 
+                {
+
+                    //
+                    List<string> patidlist2 = new List<string>();
+                    foreach (DataRow row in dt2.Rows)
+                    {
+                        if (!patidlist2.Contains(row["PATID"].ToString()))
+                        {
+                            patidlist2.Add(row["PATID"].ToString());
+                        }
+                    }
+                    string sql3 = "select *  from CISDB.dbo.INP_BRSYK a(nolock) where CYRQ>= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-" + (8 + abc) + "), 0)  and  CYRQ < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()-"+ (1 + abc) +"), 0)   and BRZT !=9 and PATID in ('" + string.Join("','", patidlist2) + "') order by PATID asc,a.RYRQ desc";
+
+                    DataTable dt3 = DbHelper.GetData(sql3, CommandType.Text, null);
+
+
+
+                    List<INP_BRSYK> daylist  = new List<INP_BRSYK>();
+                    foreach (DataRow row in dt2.Rows)
+                    {
+                        INP_BRSYK brsyk = new INP_BRSYK();
+                        brsyk.PATID = row["PATID"].ToString();
+
+
+                    // Fix for CS8957: Explicitly cast null to DateTime? to ensure compatibility with nullable types.
+                    brsyk.RYRQ =  !string.IsNullOrEmpty(row["RYRQ"]?.ToString())  ? Convert.ToDateTime(row["RYRQ"]) : (DateTime?)null;
+                    brsyk.CYRQ = !string.IsNullOrEmpty(row["CYRQ"]?.ToString()) ? Convert.ToDateTime(row["CYRQ"]) : (DateTime?)null;
+                    brsyk.RQRQ = !string.IsNullOrEmpty(row["RQRQ"]?.ToString()) ? Convert.ToDateTime(row["RQRQ"]) : (DateTime?)null;
+                    brsyk.CQRQ = !string.IsNullOrEmpty(row["CQRQ"]?.ToString()) ? Convert.ToDateTime(row["CQRQ"]) : (DateTime?)null;
+                    //brsyk.RYRQ = row["CYRQ"] != null ? Convert.ToDateTime(row["RYRQ"]) :null ;
+                    //brsyk.CYRQ = Convert.ToDateTime(row["CYRQ"] ?? null);
+                      //  brsyk.RQRQ = Convert.ToDateTime(row["RQRQ"] ?? null);
+                       // brsyk.CQRQ = Convert.ToDateTime(row["CQRQ"] ?? null);
+                        brsyk.KSDM = row["KSDM"].ToString();
+                        brsyk.KSMC = row["KSMC"].ToString();
+                        brsyk.BQDM = row["BQDM"].ToString();
+                        brsyk.BQMC = row["BQMC"].ToString();
+                        brsyk.YSDM = row["YSDM"].ToString();
+                        brsyk.YSXM = row["YSXM"].ToString();    
+                        brsyk.BLH = row["BLH"].ToString();
+                        brsyk.HZXM = row["HZXM"].ToString();
+                        brsyk.CISXH = decimal.Parse(row["CISXH"].ToString());
+                        brsyk.SEX = row["SEX"].ToString();
+                        brsyk.XSNL = row["XSNL"].ToString();
+                        brsyk.SFZH = row["SFZH"].ToString();
+                        brsyk.YBMC = row["YBMC"].ToString();
+                        brsyk.ZDDM = row["ZDDM"].ToString();
+                        brsyk.ZDMC = row["ZDMC"].ToString();
+                        daylist.Add(brsyk);
+                    }
+
+                    List<INP_BRSYK> daysevenlist  = new List<INP_BRSYK>();
+                    foreach (DataRow row in dt3.Rows)
+                    {
+                        INP_BRSYK brsyk = new INP_BRSYK();
+                        brsyk.PATID = row["PATID"].ToString();
+                    brsyk.RYRQ = !string.IsNullOrEmpty(row["RYRQ"]?.ToString()) ? Convert.ToDateTime(row["RYRQ"]) : (DateTime?)null;
+                    brsyk.CYRQ = !string.IsNullOrEmpty(row["CYRQ"]?.ToString()) ? Convert.ToDateTime(row["CYRQ"]) : (DateTime?)null;
+                    brsyk.RQRQ = !string.IsNullOrEmpty(row["RQRQ"]?.ToString()) ? Convert.ToDateTime(row["RQRQ"]) : (DateTime?)null;
+                    brsyk.CQRQ = !string.IsNullOrEmpty(row["CQRQ"]?.ToString()) ? Convert.ToDateTime(row["CQRQ"]) : (DateTime?)null;
+                    //brsyk.RYRQ = Convert.ToDateTime(row["RYRQ"] ?? null);
+                    //brsyk.CYRQ = Convert.ToDateTime(row["CYRQ"] ?? null);
+                    //brsyk.RQRQ = Convert.ToDateTime(row["RQRQ"] ?? null);
+                    //brsyk.CQRQ = Convert.ToDateTime(row["CQRQ"] ?? null);
+                    brsyk.KSDM = row["KSDM"].ToString();
+                        brsyk.KSMC = row["KSMC"].ToString();
+                        brsyk.BQDM = row["BQDM"].ToString();
+                        brsyk.BQMC = row["BQMC"].ToString();
+                        brsyk.YSDM = row["YSDM"].ToString();
+                        brsyk.YSXM = row["YSXM"].ToString();
+                        brsyk.BLH = row["BLH"].ToString();
+                        brsyk.HZXM = row["HZXM"].ToString();
+                        brsyk.CISXH = decimal.Parse(row["CISXH"].ToString());
+                        brsyk.SEX = row["SEX"].ToString();
+                        brsyk.XSNL = row["XSNL"].ToString();
+                        brsyk.SFZH = row["SFZH"].ToString();
+                        brsyk.YBMC = row["YBMC"].ToString();
+                        brsyk.ZDDM = row["ZDDM"].ToString();
+                        brsyk.ZDMC = row["ZDMC"].ToString();
+                        daysevenlist.Add(brsyk);
+                    }
+
+                    List<Result> resultlist  = new List<Result>();
+
+                    foreach (INP_BRSYK info in daylist.Where(r=>daysevenlist.Exists(p=>p.PATID== r.PATID)))
+                    {
+                        INP_BRSYK info2 = daysevenlist.FindAll(x => x.PATID == info.PATID).OrderByDescending(r=>r.CISXH).FirstOrDefault();
+                        if (info2 != null)
+                        {
+                            //如果有昨天入院的患者，且前面7日内出院的
+                            if (info.RYRQ > info2.CYRQ   && IsPaidWithin7Days((DateTime)info.RYRQ, (DateTime)info2.CYRQ))
+                            {
+                                //WriterepeatLog($"重复办理出入院的患者: {info.HZXM}，入院时间: {info.RYRQ}, 出院时间: {info2.CYRQ}");
+                                
+                                resultlist.Add(new Result
+                                {
+                                    HZXM = info.HZXM,
+                                    XSNL = info.XSNL,
+                                    SEX = info.SEX,
+                                    CYRQ = (DateTime)info2.CYRQ,
+                                    RYRQ = (DateTime)info.RYRQ,
+                                    SFZH = info.SFZH,
+                                    YBMC = info.YBMC,
+                                    CYKSMC=info2.KSMC,
+                                    RYKSMC=info.KSMC
+                                });
+
+                            }
+                        }
+
+                    }
+
+                if (resultlist.Count > 0)
+                {
+                    string accessToken = GetAccessToken();
+                    if (string.IsNullOrEmpty(accessToken))
+                    {
+                        WriteErrorLog("获取企业微信AccessToken失败");
+                        return;
+                    }
+                    string content = "";
+                    string userid = "1774|2382|3024"; // 
+                    if (istest)
+                    {
+                        userid = "3024|2382"; // 测试账号
+                    }
+
+                    string datetime2 = DateTime.Now.ToString("yyyy年MM月dd日");
+
+                    string sendtext = string.Empty;
+                    sendtext += $"`患者七日内重复入院的列表`\r\n";
+                    sendtext += $"**事项详情:**  \r\n";
+                    sendtext += $"<font color=\"info\"> \r\n";
+                    int count = 1;
+                    foreach (Result info in resultlist)
+                    {
+
+                        //sendtext += $"【" + (count++) + "】" + info.HZXM + "|第" + info.sequence + "台|" + info.patName + "、" + info.sex + "、" + info.patAge + "岁|" + info.inpNo + "(住院号)|" + info.operatdeptName + "|" + info.operation + "|" + info.anesthesiaMethod + "|" + info.surgeonName; //+ "|" + info.sstime + "(手术时间)";
+                        sendtext += $"【" + (count++) + "】" + info.HZXM + "| " + info.SEX.Trim() + "| " + info.XSNL + "| " + info.SFZH + "[身份证]| " + info.YBMC + "| "+info.CYKSMC+"[出院科室]| " + info.CYRQ.ToString("f").Trim() + "[上次出院日期]| " +info.RYKSMC+"[入院科室]| "+ info.RYRQ.ToString("f").Trim() + "[本次入院日期]|";
+                        sendtext += "\r\n";
+                        sendtext += "\r\n";
+                    }
+
+                    sendtext += $"</font>     \r\n";
+                    sendtext += $" \r\n";
+                    sendtext += $"推送日期：<font color=\"warning\">{datetime2}</font>  \n";
+                    //sendtext += $"时间：<font color=\"warning\">{infos[0].sstime}</font>  \r\n";
+                    sendtext += $" \r\n";
+                    //sendtext += $"具体安排情况可能因急诊手术会有调整，请各位医生理解配合!";
+                    //sendtext += $" \r\n";
+
+
+
+                    //foreach (DataRow row in dt2.Rows)
+                    //{
+                    //    content += $"患者姓名: {row["XM"]}，入院时间: {row["RYRQ"]}, 出院时间: {row["CYRQ"]}\r\n";
+                    //}
+
+
+
+
+
+
+                    WriteLog($"推送入参: 工号： {userid}, 入参 {sendtext}");
+                    string result = SendTextMessageMarkdown(sendUrl, accessToken, userid, sendtext);
+                    WriteLog($"推送结果: {result}");
+                }
+
+                }
+
+            //}
+
+        }
+
+        private void FormHospitalReadmission_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing) // 仅处理用户点击关闭按钮
+            {
+                e.Cancel = true;        // 取消关闭操作
+                this.WindowState = FormWindowState.Minimized; // 最小化窗口
+                this.ShowInTaskbar = false;     // 隐藏任务栏图标
+                this.notifyIcon1.Visible = true;      // 显示托盘图标
+            }
+        }
+
+       
+
+        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+        {
+            this.ShowInTaskbar = true;          // 显示任务栏图标
+            this.WindowState = FormWindowState.Normal; // 恢复窗口
+            this.Activate();                    // 激活窗口到前台
+            this.notifyIcon1.Visible = false;         // 隐藏托盘图标
+        }
+
+        private void 最大化ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.ShowInTaskbar = true;
+            this.WindowState = FormWindowState.Normal; // 恢复窗口
+            this.Activate();                    // 激活窗口到前台
+            notifyIcon1.Visible = false;
+        }
+
+        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show(
+      "确认退出程序吗？  \r\n 本程序是推送七日重复入院消息推送到医生企业微信的实时通知！ 如您不清楚情况，请不要退出本程序，请点 “否” 按钮 ！",
+      "七日重复入院推送计划",
+      MessageBoxButtons.YesNo,
+      MessageBoxIcon.Question
+  );
+            if (result == DialogResult.Yes)
+            {
+                this.timer1?.Dispose();
+                notifyIcon1.Visible = false; // 隐藏托盘图标
+                Application.Exit();         // 彻底退出程序
+            }
+        }
+
+        private void FormHospitalReadmission_Resize(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.ShowInTaskbar = false;
+                notifyIcon1.Visible = true;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            SendHospitalReadmissionMessage(true);
+        }
+
+        //private void contextMenuStrip1_Click(object sender, EventArgs e)
+        //{
+        //    this.ShowInTaskbar = true;
+        //    this.WindowState = FormWindowState.Normal; // 恢复窗口
+        //    this.Activate();                    // 激活窗口到前台
+        //    notifyIcon1.Visible = false;
+        //}
+    }
+}
