@@ -608,7 +608,16 @@ namespace SendOperationPlan
                         StringBuilder sql33 = new StringBuilder("INSERT INTO SendWeChatCriticalValue (CriticalType, HZXM,BGDH,BGSJ,CriticalValue,SENDTIME,PATID,YSDFZT) VALUES ");
                         foreach (WjzInfo info in wjzInfosmz.Where(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))
                         {
-                            sql33.AppendFormat("(1, '{0}','{1}','{2}',{3},'{4}',{5},{6}),", info.Hzxm, info.Bgdh, info.Bgsj, info.CriticalValue, info.SendTime, info.Patid, info.Ysdfzt);
+                            string name = string.Empty;
+                            if (info.Hzxm.Length > 16)
+                            {
+                                name = info.Hzxm.Substring(0, 16);
+                            }
+                            else 
+                            {
+                                name = info.Hzxm;
+                            }
+                                sql33.AppendFormat("(1, '{0}','{1}','{2}',{3},'{4}',{5},{6}),", name, info.Bgdh, info.Bgsj, info.CriticalValue, info.SendTime, info.Patid, info.Ysdfzt);
                         }
                         sql33.Length--; // 移除末尾逗号
                         DbHelper.ExecuteNonQuery(sql33.ToString(), null);
@@ -631,12 +640,7 @@ namespace SendOperationPlan
                     WriteErrorLog("更新sql语句异常:" + ex.Message);
 
                 }
-                //
-
-
-
-
-                //
+                
 
             }
 
@@ -779,7 +783,16 @@ namespace SendOperationPlan
                         StringBuilder sql331 = new StringBuilder("INSERT INTO SendWeChatCriticalValue (CriticalType, HZXM,BGDH,BGSJ,CriticalValue,SENDTIME,ZYHM,YSDFZT) VALUES ");
                         foreach (WjzInfo info in wjzInfoszy.Where(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))
                         {
-                            sql331.AppendFormat("(2, '{0}','{1}','{2}',{3},'{4}',{5},{6}),", info.Hzxm, info.Bgdh, info.Bgsj, info.CriticalValue, info.SendTime, info.Zyhm, info.Ysdfzt);
+                            string name = string.Empty;
+                            if (info.Hzxm.Length > 16)
+                            {
+                                name = info.Hzxm.Substring(0, 16);
+                            }
+                            else
+                            {
+                                name = info.Hzxm;
+                            }
+                            sql331.AppendFormat("(2, '{0}','{1}','{2}',{3},'{4}',{5},{6}),", name, info.Bgdh, info.Bgsj, info.CriticalValue, info.SendTime, info.Zyhm, info.Ysdfzt);
                         }
                         sql331.Length--; // 移除末尾逗号
                         DbHelper.ExecuteNonQuery(sql331.ToString(), null);
