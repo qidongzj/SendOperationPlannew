@@ -18,7 +18,7 @@ namespace SendOperationPlan
             Application.SetCompatibleTextRenderingDefault(false);
 
             //危急值
-            Application.Run(new FormWjz());
+            //Application.Run(new FormWjz());
 
             //手术
             //Application.Run(new Form1());
@@ -27,7 +27,7 @@ namespace SendOperationPlan
             //Application.Run(new FormHospitalReadmission());
 
             //中医优势病种
-            //Application.Run(new FormZybz());
+            Application.Run(new FormZybz());
         }
     }
 }

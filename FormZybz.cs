@@ -26,6 +26,7 @@ namespace SendOperationPlan
         {
             InitializeComponent();
             this.button2.Click += this.button2_Click;
+            this.button3.Click += this.button3_Click;
             //checkedListBox1.DrawMode = DrawMode.OwnerDrawFixed;
             //checkedListBox1.DrawItem += CheckedListBox1_DrawItem;
             //checkedListBox1.ItemCheck += checkedListBox1_ItemCheck;
@@ -35,7 +36,7 @@ namespace SendOperationPlan
 
         private List<DataTable> dtlist = new List<DataTable>();
 
-      
+
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
@@ -50,7 +51,7 @@ namespace SendOperationPlan
                 this.checkBox1.Checked = false; // 取消选中
                 this.checkBox1.CheckedChanged += checkBox1_CheckedChanged; // 重新添加事件处理器
             }
-            else 
+            else
             {
                 this.label1.Enabled = true;
                 this.label2.Enabled = true;
@@ -61,7 +62,7 @@ namespace SendOperationPlan
                 this.checkBox1.CheckedChanged += checkBox1_CheckedChanged; // 重新添加事件处理器
 
             }
-            
+
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -77,7 +78,7 @@ namespace SendOperationPlan
                 this.checkBox2.CheckedChanged += checkBox2_CheckedChanged; // 重新添加事件处理器
 
             }
-            else 
+            else
             {
                 this.label1.Enabled = false;
                 this.label2.Enabled = false;
@@ -97,7 +98,7 @@ namespace SendOperationPlan
                 for (int i = 0; i < checkedListBox1.Items.Count; i++)
                 {
                     checkedListBox1.SetItemChecked(i, true); // 勾选第 i 项
-                    
+
 
 
                 }
@@ -231,60 +232,139 @@ namespace SendOperationPlan
 
         //}
 
-        private async Task<List<DataTable>> ProcessStepExecuteasync(string mbmc)
+        private async Task<List<DataTable>> ProcessStepExecuteasync(string mbmc,int yy)
         {
-
-            if (checkBox2.Checked)
+            if (yy == 1)
             {
 
-                DataTable dt = await DbHelper.QueryDataAsync(" exec CISDB.dbo.GetZylxInfo '" + zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm + "'");
-                dtlist.Add(dt);
-                return dtlist;
+                if (checkBox2.Checked)
+                {
+
+                    DataTable dt = await DbHelper.QueryDataAsync(" exec CISDB.dbo.GetZylxInfo '" + zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm + "'");
+                    dtlist.Add(dt);
+                    return dtlist;
+                }
+                else
+                {
+                    DataTable dt = await DbHelper.QueryDataAsync(" exec CISDB.dbo.GetZylxInfoForDate '" + zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm + "','" + dateTimePicker1.Value.ToString("yyyy-MM-dd hh:mm:ss") + "','" + dateTimePicker2.Value.ToString("yyyy-MM-dd hh:mm:ss") + "'");
+                    dtlist.Add(dt);
+                    return dtlist;
+
+                }
             }
             else 
             {
-                DataTable dt = await DbHelper.QueryDataAsync(" exec CISDB.dbo.GetZylxInfoForDate '" + zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm + "','" + dateTimePicker1.Value.ToString("yyyy-MM-dd hh:mm:ss") + "','" + dateTimePicker2.Value.ToString("yyyy-MM-dd hh:mm:ss") + "'");
-                dtlist.Add(dt);
-                return dtlist;
+                
+                DataSet ds= await DbHelper.QueryDataSetAsync(" exec CISDB.dbo.GetdifferentZyysbz '" + zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm + "'");
+                if (ds.Tables.Count ==2)
+                {
+                    //foreach (DataTable dt in ds.Tables)
+                    //{
+                    //    dtlist.Add(dt);
 
+
+                    //}
+                    if (ds.Tables[0].Rows.Count == 0)
+                    {
+                        DataTable dt = new DataTable();
+                        dt.Columns.Add("数据");
+                        dt.Columns.Add("模板代码");
+                        dt.Columns.Add("模板名称");
+                        dt.Columns.Add("EMRXH");
+                        DataRow dr = dt.NewRow();
+                        dr["数据"] = "数据不存在";
+                        dr["模板代码"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm;
+                        dr["模板名称"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbmc;
+                        dr["EMRXH"] = "-99"; // 添加EMRXH列
+                        dt.Rows.Add(dr);
+                        //ds.Tables[0] = dt;
+
+                        dtlist.Add(FilterByLinq(dt, ds.Tables[1]));
+                    }
+                    else 
+                    {
+                        dtlist.Add(FilterByLinq(ds.Tables[0], ds.Tables[1]));
+                    }
+
+                    if (ds.Tables[1].Rows.Count == 0)
+                    {
+                        DataTable dt = new DataTable();
+                        dt.Columns.Add("数据");
+                        dt.Columns.Add("模板代码");
+                        dt.Columns.Add("模板名称");
+                        dt.Columns.Add("EMRXH");
+                        DataRow dr = dt.NewRow();
+                        dr["数据"] = "数据不存在";
+                        dr["模板代码"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm;
+                        dr["模板名称"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbmc;
+                        dr["EMRXH"] = "-33"; // 添加EMRXH列
+                        dt.Rows.Add(dr);
+                        dtlist.Add(FilterByLinq(dt, ds.Tables[0]));
+                    }
+                    else 
+                    {
+                        dtlist.Add(FilterByLinq(ds.Tables[1], ds.Tables[0]));
+                    }
+
+
+                        
+                    
+
+                }
+
+                return dtlist;
             }
         }
 
 
-       
+
+
+    private DataTable FilterByLinq(DataTable dt1, DataTable dt2)
+    {
+        // 获取 dt1 中所有 dt2 不存在的行（差集）
+        var diffRows = dt1.AsEnumerable()
+            .Where(row1 => !dt2.AsEnumerable()
+                .Any(row2 => row2["EMRXH"].Equals(row1["EMRXH"])));
+
+        // 转换为新 DataTable
+        DataTable result = dt1.Clone();
+        foreach (DataRow row in diffRows)
+            result.ImportRow(row);
+
+        return result;
+    }
 
 
 
-        
 
-        //public async Task<DataTable> ProcessStepExecuteAsync()
-        //{
-        //    var users = new DataTable();
+    //public async Task<DataTable> ProcessStepExecuteAsync()
+    //{
+    //    var users = new DataTable();
 
-        //    using (var connection = new SqlConnection(ConnectionString))
-        //    {
-        //        await connection.OpenAsync(); // 异步打开连接[6,7](@ref)
+    //    using (var connection = new SqlConnection(ConnectionString))
+    //    {
+    //        await connection.OpenAsync(); // 异步打开连接[6,7](@ref)
 
-        //        using (var command = new SqlCommand("SELECT Id, Name, Email FROM Users", connection))
-        //        using (var reader = await command.ExecuteReaderAsync()) // 异步读取数据[6](@ref)
-        //        {
-        //            while (await reader.ReadAsync()) // 异步逐行读取[7](@ref)
-        //            {
-        //                users.Add(new User
-        //                {
-        //                    Id = reader.GetInt32(0),
-        //                    Name = reader.GetString(1),
-        //                    Email = reader.GetString(2)
-        //                });
-        //            }
-        //        }
-        //    }
+    //        using (var command = new SqlCommand("SELECT Id, Name, Email FROM Users", connection))
+    //        using (var reader = await command.ExecuteReaderAsync()) // 异步读取数据[6](@ref)
+    //        {
+    //            while (await reader.ReadAsync()) // 异步逐行读取[7](@ref)
+    //            {
+    //                users.Add(new User
+    //                {
+    //                    Id = reader.GetInt32(0),
+    //                    Name = reader.GetString(1),
+    //                    Email = reader.GetString(2)
+    //                });
+    //            }
+    //        }
+    //    }
 
-        //    return users;
-        //}
+    //    return users;
+    //}
 
 
-        public async Task ExecuteAsync(IProgress<ProgressReport> progress, List<ProcessStep> steps)
+    public async Task ExecuteAsync(IProgress<ProgressReport> progress, List<ProcessStep> steps,int yy)
         {
             //var steps = new List<ProcessStep> {
             //new ProcessStep { StepName = "数据预处理" },
@@ -312,7 +392,7 @@ namespace SendOperationPlan
                 // 模拟业务执行（实际替换为业务代码）
                 //  await Task.Delay(new Random().Next(1000, 3000));
                 //ProcessStepExecute(report.CurrentStep);
-                await ProcessStepExecuteasync(report.CurrentStep);
+                await ProcessStepExecuteasync(report.CurrentStep,yy);
 
                 // 标记完成
                 steps[i].Status = StepStatus.Completed;
@@ -325,7 +405,7 @@ namespace SendOperationPlan
         }
 
 
-        private async Task StartProcessAsync(List<ProcessStep> mbmclist)
+        private async Task StartProcessAsync(List<ProcessStep> mbmclist,int yy)
         {
             using (var progressDialog = new ProgressDialog())
             {
@@ -339,8 +419,11 @@ namespace SendOperationPlan
 
                 try
                 {
+
+                   
+
                     // 执行业务流程
-                    await ExecuteAsync(progress, mbmclist);
+                    await ExecuteAsync(progress, mbmclist,yy);
 
                     if (progressDialog.DialogResult != DialogResult.Cancel)
                     {
@@ -368,65 +451,69 @@ namespace SendOperationPlan
             {
                 //if (checkBox2.Checked)
                 //{
-                    //不限制时间
+                //不限制时间
 
-                    if (checkedListBox1.CheckedItems.Count == 0)
+                if (checkedListBox1.CheckedItems.Count == 0)
+                {
+                    MessageBox.Show("请至少选择一个病种！");
+                    return;
+                }
+
+                IsEnable(false);
+                // this.button2.Enabled = false;
+                // this.button3.Enabled = false;
+
+                //for (int i = 0; i < checkedListBox1.CheckedItems.Count; i++)
+                //{
+                //    string mbdm = zylist.FirstOrDefault(r => r.mbmc == checkedListBox1.CheckedItems[i].ToString()).mbdm;
+                //    DataTable dt =  await DbHelper.QueryDataAsync(" exec CISDB.dbo.GetZylxInfo '" + mbdm + "'");
+                //    dtlist.Add(dt);
+                //}
+
+
+                List<ProcessStep> mbmclist = new List<ProcessStep>();
+
+                for (int i = 0; i < checkedListBox1.CheckedItems.Count; i++)
+                {
+                    string mbmc = zylist.FirstOrDefault(r => r.mbmc == checkedListBox1.CheckedItems[i].ToString()).mbmc;
+
+                    mbmclist.Add(new ProcessStep() { StepName = mbmc, Status = StepStatus.Pending });
+                }
+                dtlist = new List<DataTable>();
+
+                await StartProcessAsync(mbmclist,1);
+
+                //RunTasksWithProgress(mbmclist, ProcessStepExecute);
+
+                // ProgressForm fm = new ProgressForm();
+                // fm.RunTasksWithProgress(mbmclist, ProcessStepExecute);
+
+                if (dtlist.Count > 0)
+                {
+                    string sj = DateTime.Now.ToString("yyyyMMddHH:mm:ss").Trim().Replace(":", "");
+                    // 导出到Excel
+                    string ryrq = string.Empty;
+                    if (checkBox2.Checked)
                     {
-                        MessageBox.Show("请至少选择一个病种！");
-                        return;
+                        ryrq = string.Empty;
+                    }
+                    else
+                    {
+                        ryrq = "(" + dateTimePicker1.Value.ToString("yyyyMMdd") + "-" + dateTimePicker2.Value.ToString("yyyyMMdd") + ")";
                     }
 
-                    this.button2.Enabled = false;
+                    ExportToExcel(dtlist, "D:\\中医优势病种数据查询集" + sj + ryrq + ".xlsx");
+                    MessageBox.Show("导出成功！　D:\\中医优势病种数据查询集" + sj + ryrq + ".xlsx");
 
-                    //for (int i = 0; i < checkedListBox1.CheckedItems.Count; i++)
-                    //{
-                    //    string mbdm = zylist.FirstOrDefault(r => r.mbmc == checkedListBox1.CheckedItems[i].ToString()).mbdm;
-                    //    DataTable dt =  await DbHelper.QueryDataAsync(" exec CISDB.dbo.GetZylxInfo '" + mbdm + "'");
-                    //    dtlist.Add(dt);
-                    //}
+                    string msg = "D:\\中医优势病种数据查询集" + sj + ryrq + ".xlsx";
 
+                    System.Diagnostics.Process.Start(msg); // 打开文件夹并选中导出的文件
+                }
 
-                    List<ProcessStep> mbmclist  = new List<ProcessStep>();
+                IsEnable(true);
 
-                    for (int i = 0; i < checkedListBox1.CheckedItems.Count; i++)
-                    {
-                        string mbmc = zylist.FirstOrDefault(r => r.mbmc == checkedListBox1.CheckedItems[i].ToString()).mbmc;
-
-                        mbmclist.Add(new ProcessStep() {  StepName=mbmc,Status= StepStatus.Pending});
-                    }
-                    dtlist = new List<DataTable>();
-
-                    await StartProcessAsync(mbmclist);
-
-                    //RunTasksWithProgress(mbmclist, ProcessStepExecute);
-
-                    // ProgressForm fm = new ProgressForm();
-                    // fm.RunTasksWithProgress(mbmclist, ProcessStepExecute);
-
-                    if (dtlist.Count > 0)
-                    {
-                        string sj = DateTime.Now.ToString("yyyyMMddHH:mm:ss").Trim().Replace(":", "");
-                        // 导出到Excel
-                        string ryrq = string.Empty;
-                        if (checkBox2.Checked)
-                        {
-                            ryrq = string.Empty;
-                        }
-                        else 
-                        {
-                            ryrq ="("+dateTimePicker1.Value.ToString("yyyyMMdd") + "-" + dateTimePicker2.Value.ToString("yyyyMMdd")+")";
-                        }
-
-                        ExportToExcel(dtlist, "D:\\中医优势病种数据查询集" + sj + ryrq + ".xlsx");
-                        MessageBox.Show("导出成功！　D:\\中医优势病种数据查询集" + sj + ryrq + ".xlsx");
-
-                        string msg = "D:\\中医优势病种数据查询集" + sj + ryrq + ".xlsx";
-
-                        System.Diagnostics.Process.Start(msg); // 打开文件夹并选中导出的文件
-                    }
-
-                    this.button2.Enabled = true;// 恢复按钮状态
-
+                //this.button2.Enabled = true;// 恢复按钮状态
+                //this.button3.Enabled = true;
                 //}
                 //else
                 //{
@@ -438,51 +525,121 @@ namespace SendOperationPlan
 
                 //}
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("异常：" + ex.Message);
-                this.button2.Enabled = true; // 恢复按钮状态
+                // this.button2.Enabled = true; // 恢复按钮状态
+                // this.button3.Enabled = true;
+                IsEnable(true);
             }
-            
+
 
         }
 
 
-        public void ExportToExcel(List<DataTable> dtlist , string filePath)
+        public void ExportToExcel(List<DataTable> dtlist, string filePath)
         {
             using (var workbook = new XLWorkbook())
             {
                 //var worksheet = workbook.Worksheets.Add(dt, "Sheet1");
                 //worksheet.Columns().AdjustToContents(); // 自动调整列宽
 
-                    foreach (DataTable dt in dtlist)
+                foreach (DataTable dt in dtlist)
+                {
+                    string mm = string.Empty;
+                    if (dt.Rows[0][0].ToString() == "数据不存在")
                     {
-                        string mm = string.Empty;
-                        if (dt.Rows[0][0].ToString() == "数据不存在")
-                        {
-                                mm = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc + "（无数据）";
-                        }
-                        else
-                        {
-                                mm = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc ;
-                                //if (dt.Rows[0]["模板名称"].ToString().Trim().Length > 31)
-                                //{
-                                //    mm = dt.Rows[0]["模板名称"].ToString().Trim().Substring(0, 31);
-                                //}
-                                //else
-                                //{
-                                //    mm = dt.Rows[0]["模板名称"].ToString().Trim();
-                                //}
-
-                        }
-                        var worksheet = workbook.Worksheets.Add(dt, mm);
-                        worksheet.Columns().AdjustToContents(); // 自动调整列宽
-                                                                //worksheet.Rows().AddHorizontalPageBreaks();
+                        mm = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc + "（无数据）";
                     }
-                    workbook.SaveAs(filePath);
-                
+                    else
+                    {
+                        mm = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc;
+                        //if (dt.Rows[0]["模板名称"].ToString().Trim().Length > 31)
+                        //{
+                        //    mm = dt.Rows[0]["模板名称"].ToString().Trim().Substring(0, 31);
+                        //}
+                        //else
+                        //{
+                        //    mm = dt.Rows[0]["模板名称"].ToString().Trim();
+                        //}
+
+                    }
+                    var worksheet = workbook.Worksheets.Add(dt, mm);
+                    worksheet.Columns().AdjustToContents(); // 自动调整列宽
+                                                            //worksheet.Rows().AddHorizontalPageBreaks();
+                }
+                workbook.SaveAs(filePath);
+
             }
         }
+
+
+
+
+        public void ExportToExcel2(List<DataTable> dtlist, string filePath)
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                //var worksheet = workbook.Worksheets.Add(dt, "Sheet1");
+                //worksheet.Columns().AdjustToContents(); // 自动调整列宽
+
+                foreach (DataTable dt in dtlist)
+                {
+                    string mm = string.Empty;
+                    //if (dt.Rows[0][0].ToString() == "数据不存在")
+                    //{
+                    //    mm = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc ;
+                    //}
+                    //else
+                    //{
+                    //    mm = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc;
+
+                    //}
+
+                    string sheetName = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc + "(诊断满足但未有对应优势病种病历的患者)";
+                    bool sheetExists = workbook.Worksheets.Any(sheet =>sheet.Name.Equals(sheetName, StringComparison.OrdinalIgnoreCase));
+
+                    if (!sheetExists)
+                    {
+
+                        //mm = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc+ "(诊断满足但未有对应优势病种病历的患者)";
+                        var worksheet = workbook.Worksheets.Add(dt, sheetName);
+                        worksheet.Columns().AdjustToContents(); // 自动调整列宽
+                        
+                    }
+                    else 
+                    {
+                        //mm = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc + "(已有对应的优势病历但诊断条件不满足的)";
+
+                        string sheetName1 = zylist.FirstOrDefault(r => r.mbdm == dt.Rows[0]["模板代码"].ToString().Trim()).mbmc + "(已有对应的优势病历但诊断条件不满足的)";
+                        bool sheetExists1 = workbook.Worksheets.Any(sheet => sheet.Name.Equals(sheetName1, StringComparison.OrdinalIgnoreCase));
+
+                        if (!sheetExists1)
+                        {
+                            var worksheet = workbook.Worksheets.Add(dt, sheetName1);
+                            worksheet.Columns().AdjustToContents(); // 自动调整列宽
+                        }
+                    }
+                }
+                workbook.SaveAs(filePath);
+
+            }
+        }
+
+
+        private void IsEnable(bool T)
+        {
+            this.button1.Enabled = T;
+            this.button2.Enabled = T;
+            this.button3.Enabled = T;
+            this.checkBox1.Enabled = T;
+            this.checkBox2.Enabled = T;
+            this.dateTimePicker1.Enabled = T;
+            this.dateTimePicker2.Enabled = T;
+            this.checkedListBox1.Enabled = T;
+
+        }
+
 
         private void checkedListBox1_MouseClick(object sender, MouseEventArgs e)
         {
@@ -494,6 +651,68 @@ namespace SendOperationPlan
 
             }
         }
+
+        private async void button3_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                if (checkedListBox1.CheckedItems.Count == 0)
+                {
+                    MessageBox.Show("请至少选择一个病种！");
+                    return;
+                }
+
+                IsEnable(false);
+                //this.button3.Enabled = false;
+                //this.button2.Enabled = false; 
+
+                List<ProcessStep> mbmclist = new List<ProcessStep>();
+
+                for (int i = 0; i < checkedListBox1.CheckedItems.Count; i++)
+                {
+                    string mbmc = zylist.FirstOrDefault(r => r.mbmc == checkedListBox1.CheckedItems[i].ToString()).mbmc;
+
+                    mbmclist.Add(new ProcessStep() { StepName = mbmc, Status = StepStatus.Pending });
+                }
+                dtlist = new List<DataTable>();
+
+                await StartProcessAsync(mbmclist,2);//校验
+
+                if (dtlist.Count > 0)
+                {
+                    string sj = DateTime.Now.ToString("yyyyMMddHH:mm:ss").Trim().Replace(":", "");
+                    // 导出到Excel
+                    string ryrq = string.Empty;
+                    if (checkBox2.Checked)
+                    {
+                        ryrq = string.Empty;
+                    }
+                    else
+                    {
+                        ryrq = "(" + dateTimePicker1.Value.ToString("yyyyMMdd") + "-" + dateTimePicker2.Value.ToString("yyyyMMdd") + ")";
+                    }
+
+                    ExportToExcel2(dtlist, "D:\\(校验)中医优势病种数据校验" + sj + ryrq + ".xlsx");
+                    MessageBox.Show("导出成功！　D:\\(校验)中医优势病种数据校验" + sj + ryrq + ".xlsx");
+
+                    string msg = "D:\\(校验)中医优势病种数据校验" + sj + ryrq + ".xlsx";
+
+                    System.Diagnostics.Process.Start(msg); // 打开文件夹并选中导出的文件
+                }
+
+                IsEnable(true);
+                //this.button3.Enabled = true;// 恢复按钮状态
+                //this.button2.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("异常：" + ex.Message);
+                IsEnable(true);
+                //this.button3.Enabled = true; // 恢复按钮状态
+                //this.button2.Enabled = true;
+            }
+        } 
     }
 
 

@@ -106,5 +106,24 @@ namespace SendOperationPlan
         }
 
 
+        public static async Task<DataSet> QueryDataSetAsync(string sqlQuery, SqlParameter[] parameters = null)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                await conn.OpenAsync();
+                using (SqlCommand cmd = new SqlCommand(sqlQuery, conn))
+                {
+                    cmd.CommandTimeout = 180; // 超时时间设为3分钟
+                    if (parameters != null) cmd.Parameters.AddRange(parameters);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        DataSet ds = new DataSet();
+                        await Task.Run(() => adapter.Fill(ds)); // 异步填充DataSet
+                        return ds;
+                    }
+                }
+            }
+        }
+
     }
 }
