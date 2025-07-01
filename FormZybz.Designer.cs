@@ -165,7 +165,7 @@ namespace SendOperationPlan
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(21, 395);
+            this.button1.Location = new System.Drawing.Point(68, 394);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(104, 43);
             this.button1.TabIndex = 1;
@@ -192,7 +192,6 @@ namespace SendOperationPlan
             this.button3.TabIndex = 10;
             this.button3.Text = "校验(所有日期)";
             this.button3.UseVisualStyleBackColor = true;
-            //this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // FormZybz
             // 
@@ -210,7 +209,7 @@ namespace SendOperationPlan
             this.Controls.Add(this.dateTimePicker1);
             this.Name = "FormZybz";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "中医优势病种数据查询";
+            this.Text = "中医优势病种数据查询工具";
             this.Load += new System.EventHandler(this.FormZybz_Load);
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
