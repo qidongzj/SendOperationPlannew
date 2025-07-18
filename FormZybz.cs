@@ -279,11 +279,43 @@ namespace SendOperationPlan
                         dt.Rows.Add(dr);
                         //ds.Tables[0] = dt;
 
-                        dtlist.Add(FilterByLinq(dt, ds.Tables[1]));
+                        //比较下空重取
+
+                        DataTable dt_temp = FilterByLinq(dt, ds.Tables[1]);
+                        if (dt_temp == null || dt_temp.Rows.Count == 0)
+                        {
+                           // dt_temp.Columns.Add("数据");
+                           // dt_temp.Columns.Add("模板代码");
+                           // dt_temp.Columns.Add("模板名称");
+                           // dt_temp.Columns.Add("EMRXH");
+                            DataRow dr1 = dt_temp.NewRow();
+                            dr1["数据"] = "数据不存在";
+                            dr1["模板代码"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm;
+                            dr1["模板名称"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbmc;
+                            dr1["EMRXH"] = "-99"; // 添加EMRXH列
+                            dt_temp.Rows.Add(dr1);
+                        }
+                        dtlist.Add(dt_temp);
                     }
                     else 
                     {
-                        dtlist.Add(FilterByLinq(ds.Tables[0], ds.Tables[1]));
+                        //比较下空重取
+                        DataTable dt_temp = FilterByLinq(ds.Tables[0], ds.Tables[1]);
+                        if (dt_temp == null || dt_temp.Rows.Count == 0)
+                        {
+                            dt_temp.Columns.Add("数据");
+                            //dt_temp.Columns.Add("模板代码");
+                            dt_temp.Columns.Add("模板名称");
+                            //dt_temp.Columns.Add("EMRXH");
+                            DataRow dr1 = dt_temp.NewRow();
+                            dr1["数据"] = "数据不存在";
+                            dr1["模板代码"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm;
+                            dr1["模板名称"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbmc;
+                            dr1["EMRXH"] = "-99"; // 添加EMRXH列
+                            dt_temp.Rows.Add(dr1);
+                        }
+
+                        dtlist.Add(dt_temp);
                     }
 
                     if (ds.Tables[1].Rows.Count == 0)
@@ -299,11 +331,48 @@ namespace SendOperationPlan
                         dr["模板名称"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbmc;
                         dr["EMRXH"] = "-33"; // 添加EMRXH列
                         dt.Rows.Add(dr);
-                        dtlist.Add(FilterByLinq(dt, ds.Tables[0]));
+                        //比较下空重取
+                        //dtlist.Add(FilterByLinq(dt, ds.Tables[0]));
+
+                        DataTable dt_temp = FilterByLinq(dt, ds.Tables[0]);
+                        if (dt_temp == null || dt_temp.Rows.Count == 0)
+                        {
+                            //dt_temp.Columns.Add("数据");
+                            //dt_temp.Columns.Add("模板代码");
+                            //dt_temp.Columns.Add("模板名称");
+                            //dt_temp.Columns.Add("EMRXH");
+                            DataRow dr1 = dt_temp.NewRow();
+                            dr1["数据"] = "数据不存在";
+                            dr1["模板代码"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm;
+                            dr1["模板名称"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbmc;
+                            dr1["EMRXH"] = "-33"; // 添加EMRXH列
+                            dt_temp.Rows.Add(dr1);
+                        }
+
+                        dtlist.Add(dt_temp);
+
                     }
                     else 
                     {
-                        dtlist.Add(FilterByLinq(ds.Tables[1], ds.Tables[0]));
+
+                        DataTable dt_temp = FilterByLinq(ds.Tables[1], ds.Tables[0]);
+                        if (dt_temp == null || dt_temp.Rows.Count == 0)
+                        {
+                            dt_temp.Columns.Add("数据");
+                            //dt_temp.Columns.Add("模板代码");
+                            //dt_temp.Columns.Add("模板名称");
+                            //dt_temp.Columns.Add("EMRXH");
+                            DataRow dr1 = dt_temp.NewRow();
+                            dr1["数据"] = "数据不存在";
+                            dr1["模板代码"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm;
+                            dr1["模板名称"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbmc;
+                            dr1["EMRXH"] = "-33"; // 添加EMRXH列
+                            dt_temp.Rows.Add(dr1);
+                        }
+
+                        dtlist.Add(dt_temp);
+                        //比较下空重取
+                        //dtlist.Add(FilterByLinq(ds.Tables[1], ds.Tables[0]));
                     }
 
 

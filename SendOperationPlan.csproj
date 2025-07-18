@@ -143,6 +143,12 @@
     <Compile Include="FormHospitalReadmission.Designer.cs">
       <DependentUpon>FormHospitalReadmission.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormUpdate.Designer.cs">
+      <DependentUpon>FormUpdate.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormWjz.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -172,6 +178,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormHospitalReadmission.resx">
       <DependentUpon>FormHospitalReadmission.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormUpdate.resx">
+      <DependentUpon>FormUpdate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormWjz.resx">
       <DependentUpon>FormWjz.cs</DependentUpon>
