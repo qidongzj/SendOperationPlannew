@@ -24,7 +24,15 @@ namespace SendOperationPlan
         private static string tokenUrl = $"https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={corpid}&corpsecret={corpsecret}";
         private static string sendUrl = $"https://qyapi.weixin.qq.com/cgi-bin/message/send";  // 发送消息的URL
         private System.Timers.Timer _timer2; // 每100秒检查
+
+        private System.Timers.Timer _timer3;//每90秒检查一次
+
+        //七日重复入院使用
         private bool IsEnable3 = false;
+
+        //外国人入院使用
+        private bool IsEnable4  = false;
+
         public FormHospitalReadmission()
         {
             InitializeComponent();
@@ -157,40 +165,7 @@ namespace SendOperationPlan
         /// 
         /// </summary>
         /// <param name="log"></param>
-        private void WriterepeatLog(string log)
-        {
-            //if (!LogEnabled) return;
-
-            if (!Directory.Exists(Path.Combine(Application.StartupPath, "log"))) return;
-            try
-            {
-                string logfile = Path.Combine(Application.StartupPath, "log\\pushrepeatMessage_" + DateTime.Now.ToString("yyyyMMdd") + ".log");
-                FileStream fs = new FileStream(logfile, FileMode.Append);
-                try
-                {
-                    StreamWriter sw = new StreamWriter(fs);
-                    try
-                    {
-                        sw.Write(string.Format("{0}\r\n{1}\r\n{2}\r\n",
-                                                   "--------------------------------------------------",
-                                                   DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                                                   log
-                                                   )
-                                     );
-                    }
-                    finally
-                    {
-                        sw.Close();
-                    }
-                }
-                finally
-                {
-                    fs.Close();
-                }
-            }
-            catch
-            { }
-        }
+        
 
         private void button5_Click(object sender, EventArgs e)
         {
@@ -215,10 +190,14 @@ namespace SendOperationPlan
             _timer2.Interval = 100000; // 每100秒检查
             _timer2?.Start();
 
+            _timer3.Interval=90000; // 每90秒检查一次
+            _timer3?.Start();
+
 
 
 
             this.IsEnable3 = false; // 重置标志位
+            this.IsEnable4 = false;
 
             button3.Enabled = false;
             button4.Enabled = true;
@@ -229,16 +208,22 @@ namespace SendOperationPlan
 
             _timer2?.Stop();
 
+            _timer3?.Stop();
+
             button3.Enabled = true;
             button4.Enabled = false;
 
             this.IsEnable3 = false; // 重置标志位
+            this.IsEnable4 = false;
         }
 
         private void FormHospitalReadmission_Load(object sender, EventArgs e)
         {
             this._timer2 = new System.Timers.Timer(100 * 1000); // 每100秒检查
             this._timer2?.Start();
+            this._timer3 = new System.Timers.Timer(90 * 1000); // 每100秒检查
+            this._timer3?.Start();
+
 
             _timer2.Elapsed += (s, e1) =>
             {
@@ -251,12 +236,37 @@ namespace SendOperationPlan
                         //早上7点推送给管理员 高洁 和我 ， (昨天入院的患者,前面7日内出院的)
                         SendHospitalReadmissionMessage(false);
                     }
+                   
                     if (this._timer2.Interval == 100 * 1000)
                     {
                         _timer2.Stop(); // 停止定时器
                         _timer2.Interval = TimeSpan.FromHours(24).TotalMilliseconds; // 重置为24小时
                         _timer2.Start(); // 重新启动定时器
                         IsEnable3 = true;
+                    }
+                }
+            };
+
+
+      
+            _timer3.Elapsed += (s, e1) =>
+            {
+                if (IsEnable4 ||  (e1.SignalTime.Minute == 0 || e1.SignalTime.Minute == 1))
+                {
+                    if (checkBox1.Checked)
+                    {
+                        //每小时推送给管理员 高洁 和我 
+                        SendForeginMessage(false);
+
+                    
+                    }
+
+                    if (this._timer3.Interval == 90 * 1000)
+                    {
+                        _timer3.Stop(); // 停止定时器
+                        _timer3.Interval = TimeSpan.FromHours(1).TotalMilliseconds; // 重置为1小时
+                        _timer3.Start(); // 重新启动定时器
+                        IsEnable4 = true;
                     }
                 }
             };
@@ -278,9 +288,144 @@ namespace SendOperationPlan
             return diff.TotalSeconds <= 604800;
         }
 
-        
-       // bool isValid = IsPaidWithin7Days(order, payment); // true（相差 518,399 秒）
 
+        // bool isValid = IsPaidWithin7Days(order, payment); // true（相差 518,399 秒）
+
+        /// <summary>
+        /// 外国人门诊住院消息推送
+        /// </summary>
+        /// <param name="istest"></param>
+        private void SendForeginMessage(bool istest)
+        {
+
+            int day = 1;
+            if (istest)
+            {
+                day = 1;
+            }
+            string dt = DateTime.Now.AddDays(-day).ToString("yyyy-MM-dd").Replace("-","");
+
+            // string sql2  = "select  '门诊' MzOrZy ,FLOOR(DATEDIFF(DAY, birth, GETDATE()) / 365.25) AS age,lrrq as dyrq,sex, patid,blh,hzxm,cardno,sfzh  from THIS4.dbo.SF_BRXXK WHERE zjlx='26' and lrrq>'" + dt + "' \r\n union\r\n select  '住院' MzOrZy,FLOOR(DATEDIFF(DAY, birth, GETDATE()) / 365.25) AS age,djrq as dyrq,sex,  patid,blh,hzxm,cardno,sfzh  from THIS4.dbo.ZY_BRXXK WHERE  zjlx='26' and djrq>'" + dt+"'";
+            string sql = string.Empty;
+
+            if (istest)
+            {
+                sql = "select  '门诊' MzOrZy,FLOOR(DATEDIFF(DAY, birth, GETDATE()) / 365.25) AS age ,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx,b.ghrq as dyrq,sex, a.patid,a.blh,a.hzxm,a.sfzh,b.ksmc ,c.lbmc as ghlbmc ,d.rqflmc ybmc   from THIS4.dbo.SF_BRXXK a (nolock) join THIS4.dbo.GH_GHZDK b (nolock)\r\non a.patid=b.patid left join THIS4.dbo.GH_GHLBK c on c.lbxh=b.ghlb left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\nWHERE a.zjlx in ('1','9','21','26') \r\nand len(a.sfzh)!=18 and len(a.sfzh)>0  and b.ghrq>'" + dt + "'\r\n union\r\n select  '住院' MzOrZy,FLOOR(DATEDIFF(DAY, a.birth, GETDATE()) / 365.25) AS age,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx, b.ryrq as dyrq, a.sex, a.patid,a.blh,a.hzxm,a.sfzh,c.name as ksmc , '' as ghlbmc,d.rqflmc ybmc from THIS4.dbo.ZY_BRXXK a (nolock) join THIS4.dbo.ZY_BRSYK b(nolock) \r\n on a.patid=b.patid \r\n join THIS4.dbo.YY_KSBMK c(nolock) on c.id=b.ksdm left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\n  WHERE  a.zjlx in ('1','9','21','26') and len(a.sfzh)>0   and len(a.sfzh)!=18 and b.ryrq>'" + dt + "' and a.sfzh not like '未报%' and a.sfzh not like '户口%' and a.sfzh not like '新生%'  and a.sfzh not like '未上户口%'\r\n  and a.sfzh not like '未带%'   and a.sfzh not like '儿童%'   and a.sfzh not like '出生儿未上户口%'  and a.sfzh not like '无户口%' and a.sfzh not like '没有%' and a.sfzh not like '无%'";
+            }
+            else 
+            {
+                DateTime now = DateTime.Now;
+                DateTime hourZero = now.Date.AddHours(now.Hour); // 精确到小时，分秒归零
+                string d1 = hourZero.ToString("yyyyMMddHH:mm:ss");
+                string d2 = hourZero.AddHours(-1).ToString("yyyyMMddHH:mm:ss");
+
+                sql = "select  '门诊' MzOrZy,FLOOR(DATEDIFF(DAY, birth, GETDATE()) / 365.25) AS age ,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx,b.ghrq as dyrq,sex, a.patid,a.blh,a.hzxm,a.sfzh,b.ksmc ,c.lbmc as ghlbmc ,d.rqflmc ybmc   from THIS4.dbo.SF_BRXXK a (nolock) join THIS4.dbo.GH_GHZDK b (nolock)\r\non a.patid=b.patid left join THIS4.dbo.GH_GHLBK c on c.lbxh=b.ghlb left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\nWHERE a.zjlx in ('1','9','21','26') \r\nand len(a.sfzh)!=18 and len(a.sfzh)>0  and ( b.ghrq<'"+d1+"' and b.ghrq>='" + d2 + "') \r\n union\r\n select  '住院' MzOrZy,FLOOR(DATEDIFF(DAY, a.birth, GETDATE()) / 365.25) AS age,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx, b.ryrq as dyrq, a.sex, a.patid,a.blh,a.hzxm,a.sfzh,c.name as ksmc , '' as ghlbmc,d.rqflmc ybmc from THIS4.dbo.ZY_BRXXK a (nolock) join THIS4.dbo.ZY_BRSYK b(nolock) \r\n on a.patid=b.patid \r\n join THIS4.dbo.YY_KSBMK c(nolock) on c.id=b.ksdm left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\n  WHERE  a.zjlx in ('1','9','21','26') and len(a.sfzh)>0   and len(a.sfzh)!=18 and ( b.ryrq<'"+d1+"' and  b.ryrq>='" + d2 + "') and a.sfzh not like '未报%' and a.sfzh not like '户口%' and a.sfzh not like '新生%'  and a.sfzh not like '未上户口%'\r\n  and a.sfzh not like '未带%'   and a.sfzh not like '儿童%'   and a.sfzh not like '出生儿未上户口%'  and a.sfzh not like '无户口%' and a.sfzh not like '没有%' and a.sfzh not like '无%'";
+
+            }
+
+            DataTable dt2 = DbHelper.GetData(sql, CommandType.Text, null);
+            if (dt2 == null || dt2.Rows.Count == 0)
+            {
+                WriteLog("当日无外籍人士门诊住院就诊");
+                return;
+            }
+            else
+            {
+                List<ForeginInfo> foreginlist = new List<ForeginInfo>();
+                foreach (DataRow dr in dt2.Rows) 
+                {
+                    ForeginInfo foregin = new ForeginInfo();
+                    foregin.MzOrZy = dr["MzOrZy"].ToString();
+                    foregin.patid = dr["patid"].ToString();
+                    foregin.blh = dr["blh"].ToString();
+                    foregin.hzxm = dr["hzxm"].ToString();
+                    //foregin.cardno = dr["cardno"].ToString();
+                    foregin.sfzh = dr["sfzh"].ToString();
+                    foregin.age=dr["age"].ToString();
+                    foregin.sex = dr["sex"].ToString();
+                    foregin.dyrq = dr["dyrq"].ToString(); // 到院日期
+                    foregin.ksmc = dr["ksmc"].ToString() ;
+                    foregin.zjlx = dr["zjlx"].ToString(); // 就诊类型
+                    foregin.ghlbmc = dr["ghlbmc"].ToString(); 
+                    foregin.ybmc = dr["ybmc"].ToString(); // 医保名称
+                    foreginlist.Add(foregin);
+                }
+
+                if (foreginlist.Count > 0)
+                {
+                    string accessToken = GetAccessToken();
+                    if (string.IsNullOrEmpty(accessToken))
+                    {
+                        WriteErrorLog("获取企业微信AccessToken失败");
+                        return;
+                    }
+                    //string content = "";
+                    string userid = "2382|3024"; // 
+                    if (istest)
+                    {
+                        userid = "2382|3024"; // 测试账号
+                    }
+
+                    string datetime2 = DateTime.Now.ToString("yyyy年MM月dd日");
+
+                    string sendtext = string.Empty;
+                    sendtext = $"`外籍人士入院就诊患者信息` \r\n" +
+                               $"**事项详情:**  \r\n" +
+                               $"<font color=\"info\"> \r\n";
+                    int count = 1;
+                    foreach (ForeginInfo info in foreginlist)
+                    {
+                        sendtext += $"【" + (count++) + "】" + info.MzOrZy + "：" +info.ksmc+","+ info.hzxm + "," + info.sex.Trim() + "," + info.age + "岁\r\n";
+                        //sendtext += $"卡号:" + info.cardno+"\r\n";
+                        sendtext += $"挂号类别:" + info.ghlbmc + "\r\n";
+                        sendtext += $"医保费别:" + info.ybmc + "\r\n";
+                        sendtext += $"证件类型:" + info.zjlx + "\r\n";
+                        sendtext += $"证件号:" +info.sfzh + "\r\n";
+                        if (info.MzOrZy == "住院")
+                        {
+                            sendtext += $"入院日期:" + info.dyrq + "\r\n";
+                        }
+                        else 
+                        {
+                            sendtext += $"就诊日期:" + info.dyrq + "\r\n";
+                        }
+                    }
+                    sendtext += $"</font>  \r\n";
+
+                    sendtext += $"推送日期：<font color=\"warning\">{datetime2}</font>  \n";
+                    sendtext += $" \r\n";
+
+                    WriteLog($"推送入参: 工号： {userid}, 入参 {sendtext}");
+                    string result = SendTextMessageMarkdown(sendUrl, accessToken, userid, sendtext);
+                    WriteLog($"推送结果: {result}");
+
+                    //string sendtext = string.Empty;
+                    //sendtext += $"`患者七日内重复入院的列表`\r\n";
+                    //sendtext += $"**事项详情:**  \r\n";
+                    //sendtext += $"<font color=\"info\"> \r\n";
+                    //int count = 1;
+                    //foreach (Result info in resultlist)
+                    //{
+
+                    //    sendtext += $"【" + (count++) + "】" + info.HZXM + "," + info.SEX.Trim() + "," + info.XSNL + "," + info.YBMC + "  \r\n";
+                    //    sendtext += $"上次出院:" + info.SCZYH + "," + info.CYKSMC + "," + info.CYRQ.ToString("D") + " " + info.CYRQ.Hour + "时, " + info.CYZDMC + ", 住院天数:" + info.ZYTS + "  \r\n";
+                    //    sendtext += $"本次入院:" + info.BCZYH + "," + info.RYKSMC + "," + info.RYRQ.ToString("D") + " " + info.RYRQ.Hour + "时, " + info.RYZDMC + "  \r\n";
+                    //    sendtext += "\r\n";
+                    //}
+                    //sendtext += $"</font>  \r\n";
+                    //sendtext += $"推送日期：<font color=\"warning\">{datetime2}</font>  \n";
+                    //sendtext += $" \r\n";
+
+
+
+
+
+
+
+                }
+
+            }
+        }
 
         /// <summary>
         /// (昨天入院的患者,前面7日内出院的)
@@ -348,15 +493,15 @@ namespace SendOperationPlan
                         brsyk.PATID = row["PATID"].ToString();
 
 
-                    // Fix for CS8957: Explicitly cast null to DateTime? to ensure compatibility with nullable types.
-                    brsyk.RYRQ =  !string.IsNullOrEmpty(row["RYRQ"]?.ToString())  ? Convert.ToDateTime(row["RYRQ"]) : (DateTime?)null;
-                    brsyk.CYRQ = !string.IsNullOrEmpty(row["CYRQ"]?.ToString()) ? Convert.ToDateTime(row["CYRQ"]) : (DateTime?)null;
-                    brsyk.RQRQ = !string.IsNullOrEmpty(row["RQRQ"]?.ToString()) ? Convert.ToDateTime(row["RQRQ"]) : (DateTime?)null;
-                    brsyk.CQRQ = !string.IsNullOrEmpty(row["CQRQ"]?.ToString()) ? Convert.ToDateTime(row["CQRQ"]) : (DateTime?)null;
-                    //brsyk.RYRQ = row["CYRQ"] != null ? Convert.ToDateTime(row["RYRQ"]) :null ;
-                    //brsyk.CYRQ = Convert.ToDateTime(row["CYRQ"] ?? null);
-                      //  brsyk.RQRQ = Convert.ToDateTime(row["RQRQ"] ?? null);
-                       // brsyk.CQRQ = Convert.ToDateTime(row["CQRQ"] ?? null);
+                        // Fix for CS8957: Explicitly cast null to DateTime? to ensure compatibility with nullable types.
+                        brsyk.RYRQ =  !string.IsNullOrEmpty(row["RYRQ"]?.ToString())  ? Convert.ToDateTime(row["RYRQ"]) : (DateTime?)null;
+                        brsyk.CYRQ = !string.IsNullOrEmpty(row["CYRQ"]?.ToString()) ? Convert.ToDateTime(row["CYRQ"]) : (DateTime?)null;
+                        brsyk.RQRQ = !string.IsNullOrEmpty(row["RQRQ"]?.ToString()) ? Convert.ToDateTime(row["RQRQ"]) : (DateTime?)null;
+                        brsyk.CQRQ = !string.IsNullOrEmpty(row["CQRQ"]?.ToString()) ? Convert.ToDateTime(row["CQRQ"]) : (DateTime?)null;
+                        //brsyk.RYRQ = row["CYRQ"] != null ? Convert.ToDateTime(row["RYRQ"]) :null ;
+                        //brsyk.CYRQ = Convert.ToDateTime(row["CYRQ"] ?? null);
+                        //  brsyk.RQRQ = Convert.ToDateTime(row["RQRQ"] ?? null);
+                        // brsyk.CQRQ = Convert.ToDateTime(row["CQRQ"] ?? null);
                         brsyk.KSDM = row["KSDM"].ToString();
                         brsyk.KSMC = row["KSMC"].ToString();
                         brsyk.BQDM = row["BQDM"].ToString();
@@ -555,7 +700,7 @@ namespace SendOperationPlan
         private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show(
-      "确认退出程序吗？  \r\n 本程序是推送七日重复入院消息推送到医生企业微信的实时通知！ 如您不清楚情况，请不要退出本程序，请点 “否” 按钮 ！",
+      "确认退出程序吗？  \r\n 本程序是推送七日重复入院消息/外籍人士门诊住院就诊消息 推送到医生企业微信的实时通知！ 如您不清楚情况，请不要退出本程序，请点 “否” 按钮 ！",
       "七日重复入院推送计划",
       MessageBoxButtons.YesNo,
       MessageBoxIcon.Question
@@ -580,6 +725,11 @@ namespace SendOperationPlan
         private void button1_Click(object sender, EventArgs e)
         {
             SendHospitalReadmissionMessage(true);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            SendForeginMessage(true);
         }
 
         //private void contextMenuStrip1_Click(object sender, EventArgs e)

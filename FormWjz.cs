@@ -302,522 +302,533 @@ namespace SendOperationPlan
         /// <param name="type">1=门诊 ，2住院,3 全部</param>
         private void SendMessage(bool istest)
         {
-            string sql = "SELECT * 　FROM　　SendWeChatCriticalValue(nolock) WHERE SENDTIME >GETDATE()-1 ";
-            DataTable dataTable = DbHelper.GetData(sql, CommandType.Text, null);
-            wjzsendedInfosList = new List<WjzInfo>();
-            wjzBeginSendInfosList = new List<WjzInfo>();
-            wjzInfosmz = new List<WjzInfo>();
-            wjzInfoszy = new List<WjzInfo>();
-
-           
-
-            //门诊危急值数据
-            string sqlmz = "SELECT  * FROM  OUTP_BRWJZXXK(NOLOCK) WHERE  BGSJ >= (CONVERT(varchar, CAST(GETDATE()-1 AS DATE), 112) + '00:00:00') ORDER BY BGSJ ASC,XH ASC";
-            DataTable dataTablemz = DbHelper.GetData(sqlmz, CommandType.Text, null);
-            if (dataTablemz != null && dataTablemz.Rows.Count>0) 
+            try
             {
+                string sql = "SELECT * 　FROM　　SendWeChatCriticalValue(nolock) WHERE SENDTIME >GETDATE()-1 ";
+                DataTable dataTable = DbHelper.GetData(sql, CommandType.Text, null);
+                wjzsendedInfosList = new List<WjzInfo>();
+                wjzBeginSendInfosList = new List<WjzInfo>();
+                wjzInfosmz = new List<WjzInfo>();
+                wjzInfoszy = new List<WjzInfo>();
 
-                foreach (DataRow row in dataTablemz.Rows)
+
+
+                //门诊危急值数据
+                string sqlmz = "SELECT  * FROM  OUTP_BRWJZXXK(NOLOCK) WHERE  BGSJ >= (CONVERT(varchar, CAST(GETDATE()-1 AS DATE), 112) + '00:00:00') ORDER BY BGSJ ASC,XH ASC";
+                DataTable dataTablemz = DbHelper.GetData(sqlmz, CommandType.Text, null);
+                if (dataTablemz != null && dataTablemz.Rows.Count > 0)
                 {
-                    WjzInfo wjzInfo = new WjzInfo();
-                    wjzInfo.CriticalType = 1; //1门诊 2住院
-                    wjzInfo.Hzxm = row["HZXM"].ToString();
-                    wjzInfo.Bgdh = row["BGDH"]?.ToString();
-                    wjzInfo.Bgsj = row["BGSJ"]?.ToString();
-                    wjzInfo.CriticalValue = Convert.ToDecimal(row["XH"]?.ToString().Trim());//危急值主表序号
-                    wjzInfo.Wjnr = row["WJNR"]?.ToString();
-                    wjzInfo.Patid = Convert.ToDecimal((row["PATID"] ?? "-1").ToString().Trim());
-                    wjzInfo.Sjkdysdm = row["SJKDYSDM"]?.ToString();
-                    wjzInfo.Sjkdysmc= row["SJKDYSMC"]?.ToString();
-                    wjzInfo.Sjksdm = row["SJKSDM"]?.ToString();
-                    wjzInfo.Sjksmc = row["SJKDMC"]?.ToString();
-                    wjzInfo.Sjbqdm = row["SJBQDM"]?.ToString();
-                    wjzInfo.Sjbqmc = row["SJBQMC"]?.ToString();
-                    wjzInfo.Sjrq = row["SJRQ"]?.ToString();
-                    wjzInfo.Ysdfzt = (row["JLZT"] ?? "-1").ToString().Trim();  //0未答复 1已答复
-                    wjzInfo.Ysdfnr = row["YSDFNR"]?.ToString();
-                    wjzInfo.Jsysdm = row["JSYSDM"]?.ToString();
-                    wjzInfo.Jsysmc = row["JSYSMC"]?.ToString();
-                    wjzInfo.Ysjssj = row["JSYSSJ"]?.ToString();
-                    wjzInfo.SendTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                    
-                    //wjzInfo.Zyhm = row["ZYHM"]?.ToString();
-                  
-                    wjzBeginSendInfosList.Add(wjzInfo);
-                }
 
-            }
-
-
-
-            //住院危急值数据
-            string sqlzy = "SELECT  * FROM  INP_BRWJZXXK(NOLOCK) WHERE  BGSJ >= GETDATE()-1 ORDER BY BGSJ ASC,XH ASC";
-            DataTable dataTablezy = DbHelper.GetData(sqlzy, CommandType.Text, null);
-            if (dataTablezy != null && dataTablezy.Rows.Count > 0)
-            {
-                foreach (DataRow row in dataTablezy.Rows)
-                {
-                    WjzInfo wjzInfo = new WjzInfo();
-                    wjzInfo.CriticalType = 2; //1门诊 2住院
-
-                    wjzInfo.Hzxm = row["HZXM"].ToString();
-                    wjzInfo.Bgdh = row["BGDH"]?.ToString();
-                    wjzInfo.Bgsj = row["BGSJ"]?.ToString();
-                    wjzInfo.CriticalValue = Convert.ToDecimal(row["XH"]?.ToString().Trim());//危急值主表序号
-                    wjzInfo.Wjnr = row["WJNR"]?.ToString();
-
-                    //wjzInfo.Patid = Convert.ToDecimal((row["PATID"] ?? "-1").ToString().Trim());
-                    wjzInfo.Zyhm = row["ZYHM"]?.ToString();
-                    wjzInfo.Sjkdysdm = row["SJKDYSDM"]?.ToString();
-                    wjzInfo.Sjkdysmc = row["SJKDYSMC"]?.ToString();
-                    wjzInfo.Sjksdm = row["SJKSDM"]?.ToString();
-                    wjzInfo.Sjksmc = row["SJKSMC"]?.ToString();
-                    wjzInfo.Sjbqdm = row["SJBQDM"]?.ToString();
-                    wjzInfo.Sjbqmc = row["SJBQMC"]?.ToString();
-                    wjzInfo.Sjrq = row["SJRQ"]?.ToString();
-                    wjzInfo.Ysdfzt = (row["STATUS"] ?? "-1").ToString().Trim()=="11"?"0": (row["STATUS"] ?? "-1").ToString().Trim();  //0未答复 1已答复
-                   // if()
-                    wjzInfo.Ysdfnr = row["YSDFNR"]?.ToString();
-                    wjzInfo.Jsysdm = row["JSYSDM"]?.ToString();
-                    wjzInfo.Jsysmc = row["JSYSMC"]?.ToString();
-                    wjzInfo.Ysjssj = row["JSYSSJ"]?.ToString();
-                    wjzInfo.Czsj=row["CZSJ"]?.ToString();//处置时间
-                    wjzInfo.Dfysmc = row["DFYSMC"]?.ToString();//应该答复医生姓名
-                    wjzInfo.Dfysdm = row["DFYSDM"]?.ToString();//应该答复医生代码
-                    wjzInfo.SendTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                    wjzBeginSendInfosList.Add(wjzInfo);
-
-                }
-            }
-
-
-            if (wjzBeginSendInfosList.Count == 0)
-            {
-                return;
-            }
-
-            if (dataTable == null || dataTable.Rows.Count == 0)
-            {
-                //WriteLog("没有需要推送的危急值消息！");
-                //return;
-                //wjzsendedInfosList= new List<WjzInfo>();
-            }
-            else
-            {
-                foreach (DataRow row in dataTable.Rows)
-                {
-                    WjzInfo wjzInfo = new WjzInfo();
-                    wjzInfo.CriticalType = Convert.ToInt32(row["CriticalType"].ToString().Trim()); //1门诊 2住院
-                    wjzInfo.Hzxm = row["Hzxm"].ToString();
-                    wjzInfo.Bgdh = row["BGDH"]?.ToString();
-                    wjzInfo.Bgsj = row["BGSJ"]?.ToString();
-                    wjzInfo.CriticalValue = Convert.ToDecimal(row["CriticalValue"]?.ToString().Trim());//危急值主表序号
-                    wjzInfo.SendTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-                    //wjzInfo.Wjnr = row["Wjnr"].ToString();
-                    if (wjzInfo.CriticalType == 2)
+                    foreach (DataRow row in dataTablemz.Rows)
                     {
-                        wjzInfo.Zyhm = row["ZYHM"]?.ToString();
-                    }
-                    else
-                    {
+                        WjzInfo wjzInfo = new WjzInfo();
+                        wjzInfo.CriticalType = 1; //1门诊 2住院
+                        wjzInfo.Hzxm = row["HZXM"].ToString();
+                        wjzInfo.Bgdh = row["BGDH"]?.ToString();
+                        wjzInfo.Bgsj = row["BGSJ"]?.ToString();
+                        wjzInfo.CriticalValue = Convert.ToDecimal(row["XH"]?.ToString().Trim());//危急值主表序号
+                        wjzInfo.Wjnr = row["WJNR"]?.ToString();
                         wjzInfo.Patid = Convert.ToDecimal((row["PATID"] ?? "-1").ToString().Trim());
+                        wjzInfo.Sjkdysdm = row["SJKDYSDM"]?.ToString();
+                        wjzInfo.Sjkdysmc = row["SJKDYSMC"]?.ToString();
+                        wjzInfo.Sjksdm = row["SJKSDM"]?.ToString();
+                        wjzInfo.Sjksmc = row["SJKDMC"]?.ToString();
+                        wjzInfo.Sjbqdm = row["SJBQDM"]?.ToString();
+                        wjzInfo.Sjbqmc = row["SJBQMC"]?.ToString();
+                        wjzInfo.Sjrq = row["SJRQ"]?.ToString();
+                        wjzInfo.Ysdfzt = (row["JLZT"] ?? "-1").ToString().Trim();  //0未答复 1已答复
+                        wjzInfo.Ysdfnr = row["YSDFNR"]?.ToString();
+                        wjzInfo.Jsysdm = row["JSYSDM"]?.ToString();
+                        wjzInfo.Jsysmc = row["JSYSMC"]?.ToString();
+                        wjzInfo.Ysjssj = row["JSYSSJ"]?.ToString();
+                        wjzInfo.SendTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+
+                        //wjzInfo.Zyhm = row["ZYHM"]?.ToString();
+
+                        wjzBeginSendInfosList.Add(wjzInfo);
                     }
-                    wjzInfo.Ysdfzt = (row["YSDFZT"] ?? "-1").ToString().Trim();  //0未答复 1已答复
-                    wjzsendedInfosList.Add(wjzInfo);
-                }
-            }
-
-
-
-
-
-
-            //门诊
-            if (wjzBeginSendInfosList.Count != 0  && wjzBeginSendInfosList.Exists(r => r.CriticalType == 1) )//门诊CriticalType是1
-           {
-                foreach (WjzInfo wjzInfo in wjzBeginSendInfosList.Where(r=>r.CriticalType==1))
-                {
-                    if (!wjzsendedInfosList.FindAll(r=>r.CriticalType== wjzInfo.CriticalType).Exists(r =>  r.CriticalValue==wjzInfo.CriticalValue ))
-                    {
-                        wjzInfo.Gxlx = 1; //新增
-                        wjzInfosmz.Add(wjzInfo);
-                    }
-                    else 
-                    {
-                        if (wjzsendedInfosList.FindAll(r => r.CriticalType == wjzInfo.CriticalType).Exists(r =>   r.CriticalValue == wjzInfo.CriticalValue && r.Ysdfzt != wjzInfo.Ysdfzt))
-                        {
-                            wjzInfo.Gxlx = 2; //更新
-                            wjzInfosmz.Add(wjzInfo);
-                        }
-                    }
-                }
-           }
-
-           //住院
-            if (wjzBeginSendInfosList.Count != 0 && wjzBeginSendInfosList.Exists(r => r.CriticalType == 2) )//住院CriticalType是2
-            {
-                foreach (WjzInfo wjzInfo in wjzBeginSendInfosList.Where(r => r.CriticalType == 2))
-                {
-                    if (!wjzsendedInfosList.FindAll(r => r.CriticalType == wjzInfo.CriticalType).Exists(r => r.CriticalValue == wjzInfo.CriticalValue))
-                    {
-                        wjzInfo.Gxlx = 1; //新增
-                        wjzInfoszy.Add(wjzInfo);
-                    }
-                    else
-                    {
-                        if (wjzsendedInfosList.FindAll(r => r.CriticalType == wjzInfo.CriticalType).Exists(r => r.CriticalValue == wjzInfo.CriticalValue && r.Ysdfzt != wjzInfo.Ysdfzt))
-                        {
-                            wjzInfo.Gxlx = 2; //更新
-                            wjzInfoszy.Add(wjzInfo);
-                        }
-                    }
-                }
-            }
-
-            string datetime2 = DateTime.Now.ToString("yyyy年MM月dd日");
-            //string datetime3  = DateTime.Now.ToString("yyyy年MM月dd日");
-            //门诊
-            if (wjzInfosmz.Count != 0)
-            {
-                // 第一步推送掉数据  第二天R数据 完全没有的先插入,已有的状态更新掉
-
-                foreach (WjzInfo info in wjzInfosmz)
-                {
-                    //string accessToken = GetAccessToken();
-                    string content = "";
-                    //string content1 = "";
-                    //string content2 = "";
-                    //string content3 = "";
-                    //string content4 = "";
-                    if (info.Ysdfzt == "0")
-                    {
-                        content = $"`门急诊患者危急值通知(未处理)`\r\n" +
-                                    $"**事项详情:**  \r\n" +
-                                    $"<font color=\"blue\"> \r\n" +
-
-                                   $" 患者姓名：{info.Hzxm} " +
-                                    "\r\n" +
-                                   //$" 患者PATID：{info.Patid} " +
-                                   //"\r\n" +
-                                   //$" 报告单号：{info.Bgdh} " +
-                                   //"\r\n" +
-                                   $" 送检时间：{info.Sjrq} " +
-                                   "\r\n" +
-                                   $" 报告时间：{info.Bgsj} " +
-                                   "\r\n" +
-                                   $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
-                                   "\r\n" +
-                                   $" 送检科室：{info.Sjksmc} " +
-                                   "\r\n" +
-                                   $" 开单医生：{info.Sjkdysmc} " +
-                                    $"</font>     \r\n" +
-                                   $"消息日期：<font color=\"warning\">{datetime2}</font>  \n";
-                        ;
-
-                    }
-                    if (info.Ysdfzt == "1")
-                    {
-                        content = $"`门急诊患者危急值通知(已处理)`\r\n" +
-                                    $"**事项详情:**  \r\n" +
-                                    $"<font color=\"info\"> \r\n" +
-                                   $" 患者姓名：{info.Hzxm} " +
-                                    "\r\n" +
-                                   //$" 患者PATID：{info.Patid} " +
-                                   // "\r\n" +
-                                   //$" 报告单号：{info.Bgdh} " +
-                                   // "\r\n" +
-                                   $" 送检时间：{info.Sjrq} " +
-                                    "\r\n" +
-                                    $" 报告时间：{info.Bgsj} " +
-                                     "\r\n" +
-                                    $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
-                                    "\r\n" +
-                                    $" 送检科室：{info.Sjksmc} " +
-                                     "\r\n" +
-                                    $" 开单医生：{info.Sjkdysmc} " +
-                                     "\r\n" +
-                                    $" 处理医生：{info.Jsysmc} " +
-                                     "\r\n" +
-                                    $" 处理时间：{info.Ysjssj} " +
-                                     "\r\n" +
-                                    $" 医生答复内容：{info.Ysdfnr} " +
-                                     "\r\n" +
-                                    $"</font>     \r\n" +
-                                    $"消息日期：<font color=\"warning\">{datetime2}</font>  \n";
-                    }
-
-
-                    string token = GetAccessToken();
-                    string msg = string.Empty;
-                    if (istest)
-                    {
-                        //测试
-                        msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(info.Sjkdysdm?.ToString().Trim()))
-                        {
-                            //正式
-                            msg = SendTextMessageMarkdown(sendUrl, token, info.Sjkdysdm?.ToString().Trim(), content);
-                        }
-                        else 
-                        {
-                            //开单医生代码为空时，使用配置的测试用户
-                            msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
-                        }
-                    }
-
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
-                    if (data.errmsg == "ok"  || data.errcode== 81013)//81013 表示这个患者没有企业微信里注册
-                    {
-                        //foreach (WjzInfo info2 in wjzInfosmz)
-                        //{
-                            info.是否推送成功 = "成功";
-                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        //}
-                    }
-                    else
-                    {
-                        //foreach (WjzInfo info2 in wjzInfosmz)
-                        //{
-                            info.是否推送成功 = "失败";
-                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        //}
-                    }
-                    string xxx = string.Empty;
-                    if (istest)
-                    {
-                        xxx = textBox1.Text.ToString().Trim() + " (测试数据)";
-                    }
-                    else
-                    {
-                        xxx = info.Sjkdysdm;
-                    }
-
-                    WriteLog("url:" + sendUrl + "    \r\n  token:" + token + "  \r\n userid:" + xxx + " \r\n  sendmessage:" + content + " \r\n  回参:" + msg);
-
-
 
                 }
 
-                try
+
+
+                //住院危急值数据
+                string sqlzy = "SELECT  * FROM  INP_BRWJZXXK(NOLOCK) WHERE  BGSJ >= GETDATE()-1 ORDER BY BGSJ ASC,XH ASC";
+                DataTable dataTablezy = DbHelper.GetData(sqlzy, CommandType.Text, null);
+                if (dataTablezy != null && dataTablezy.Rows.Count > 0)
                 {
-                    if (wjzInfosmz.Exists(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))//新增
+                    foreach (DataRow row in dataTablezy.Rows)
                     {
-                        StringBuilder sql33 = new StringBuilder("INSERT INTO SendWeChatCriticalValue (CriticalType, HZXM,BGDH,BGSJ,CriticalValue,SENDTIME,PATID,YSDFZT) VALUES ");
-                        foreach (WjzInfo info in wjzInfosmz.Where(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))
-                        {
-                            string name = string.Empty;
-                            if (info.Hzxm.Length > 16)
-                            {
-                                name = info.Hzxm.Substring(0, 16);
-                            }
-                            else 
-                            {
-                                name = info.Hzxm;
-                            }
-                                sql33.AppendFormat("(1, '{0}','{1}','{2}',{3},'{4}',{5},{6}),", name, info.Bgdh, info.Bgsj, info.CriticalValue, info.SendTime, info.Patid, info.Ysdfzt);
-                        }
-                        sql33.Length--; // 移除末尾逗号
-                        DbHelper.ExecuteNonQuery(sql33.ToString(), null);
-                    }
+                        WjzInfo wjzInfo = new WjzInfo();
+                        wjzInfo.CriticalType = 2; //1门诊 2住院
 
-                    if (wjzInfosmz.Exists(r => r.Gxlx == 2 && r.是否推送成功 == "成功"))//更新
-                    {
-                        string CriticalValuestr = string.Join(",", wjzInfosmz.Where(r => r.Gxlx == 2 && r.是否推送成功 == "成功").Select(x => x.CriticalValue));
+                        wjzInfo.Hzxm = row["HZXM"].ToString();
+                        wjzInfo.Bgdh = row["BGDH"]?.ToString();
+                        wjzInfo.Bgsj = row["BGSJ"]?.ToString();
+                        wjzInfo.CriticalValue = Convert.ToDecimal(row["XH"]?.ToString().Trim());//危急值主表序号
+                        wjzInfo.Wjnr = row["WJNR"]?.ToString();
 
-                        string sql45 = "update SendWeChatCriticalValue set YSDFZT=1 where YSDFZT=0  and CriticalType=1 and CriticalValue in (" + CriticalValuestr + ")";
-
-                        WriteLog("更新sql语句:" + sql45);
-
-                        DbHelper.ExecuteNonQuery(sql45, null);
+                        //wjzInfo.Patid = Convert.ToDecimal((row["PATID"] ?? "-1").ToString().Trim());
+                        wjzInfo.Zyhm = row["ZYHM"]?.ToString();
+                        wjzInfo.Sjkdysdm = row["SJKDYSDM"]?.ToString();
+                        wjzInfo.Sjkdysmc = row["SJKDYSMC"]?.ToString();
+                        wjzInfo.Sjksdm = row["SJKSDM"]?.ToString();
+                        wjzInfo.Sjksmc = row["SJKSMC"]?.ToString();
+                        wjzInfo.Sjbqdm = row["SJBQDM"]?.ToString();
+                        wjzInfo.Sjbqmc = row["SJBQMC"]?.ToString();
+                        wjzInfo.Sjrq = row["SJRQ"]?.ToString();
+                        wjzInfo.Ysdfzt = (row["STATUS"] ?? "-1").ToString().Trim() == "11" ? "0" : (row["STATUS"] ?? "-1").ToString().Trim();  //0未答复 1已答复
+                                                                                                                                               // if()
+                        wjzInfo.Ysdfnr = row["YSDFNR"]?.ToString();
+                        wjzInfo.Jsysdm = row["JSYSDM"]?.ToString();
+                        wjzInfo.Jsysmc = row["JSYSMC"]?.ToString();
+                        wjzInfo.Ysjssj = row["JSYSSJ"]?.ToString();
+                        wjzInfo.Czsj = row["CZSJ"]?.ToString();//处置时间
+                        wjzInfo.Dfysmc = row["DFYSMC"]?.ToString();//应该答复医生姓名
+                        wjzInfo.Dfysdm = row["DFYSDM"]?.ToString();//应该答复医生代码
+                        wjzInfo.SendTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                        wjzBeginSendInfosList.Add(wjzInfo);
 
                     }
                 }
-                catch (Exception ex)
-                {
-                    WriteErrorLog("更新sql语句异常:" + ex.Message);
 
+
+                if (wjzBeginSendInfosList.Count == 0)
+                {
+                    return;
                 }
-                
 
-            }
-
-
-
-
-
-            //住院
-            if (wjzInfoszy.Count != 0)
-            {
-                // 第一步推送掉数据  第二天R数据 完全没有的先插入,已有的状态更新掉
-
-                foreach (WjzInfo info in wjzInfoszy)
+                if (dataTable == null || dataTable.Rows.Count == 0)
                 {
-                    //string accessToken = GetAccessToken();
-                    string content = "";
-                    //string content1 = "";
-                    //string content2 = "";
-                    //string content3 = "";
-                    //string content4 = "";
-                    if (info.Ysdfzt == "0" || info.Ysdfzt == "11")
+                    //WriteLog("没有需要推送的危急值消息！");
+                    //return;
+                    //wjzsendedInfosList= new List<WjzInfo>();
+                }
+                else
+                {
+                    foreach (DataRow row in dataTable.Rows)
                     {
-                        
-                        content = $"`住院患者危急值通知(未处理)`\r\n" +
-                                    $"**事项详情:**  \r\n" +
-                                    $"<font color=\"blue\"> \r\n" +
-
-                                   $" 患者姓名：{info.Hzxm} " +
-                                    "\r\n" +
-                                   //$" 患者PATID：{info.Patid} " +
-                                   //"\r\n" +
-                                   //$" 报告单号：{info.Bgdh} " +
-                                   //"\r\n" +
-                                   //$" 送检时间：{info.Sjrq} " +
-                                   //"\r\n" +
-                                   $" 报告时间：{info.Bgsj.Replace("-", "")} " +
-                                   "\r\n" +
-                                   $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
-                                   "\r\n" +
-                                   $" 送检科室：{info.Sjksmc} " +
-                                   "\r\n" +
-                                   $" 接收医生：{info.Dfysmc} " +
-                                    $"</font>     \r\n" +
-                                   $"消息日期：<font color=\"warning\">{datetime2}</font>  \n";
-                        ;
-
-                    }
-                    if (info.Ysdfzt == "1")
-                    {
-                        content = $"`住院患者危急值通知(已处理)`\r\n" +
-                                    $"**事项详情:**  \r\n" +
-                                    $"<font color=\"info\"> \r\n" +
-                                   $" 患者姓名：{info.Hzxm} " +
-                                    "\r\n" +
-                                   //$" 患者PATID：{info.Patid} " +
-                                   // "\r\n" +
-                                   //$" 报告单号：{info.Bgdh} " +
-                                   // "\r\n" +
-                                   //$" 送检时间：{info.Sjrq} " +
-                                   // "\r\n" +
-                                    $" 报告时间：{info.Bgsj.Replace("-", "")} " +
-                                     "\r\n" +
-                                    $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
-                                    "\r\n" +
-                                    $" 送检科室：{info.Sjksmc} " +
-                                     "\r\n" +
-                                    $" 接收医生：{info.Dfysmc} " +
-                                     "\r\n" +
-                                    $" 处理医生：{info.Jsysmc} " +
-                                     "\r\n" +
-                                    $" 处理时间：{info.Czsj.Replace("-", "")} " +
-                                     "\r\n" +
-                                    $" 医生答复内容：{info.Ysdfnr} " +
-                                     "\r\n" +
-                                    $"</font>     \r\n" +
-                                    $"消息日期：<font color=\"warning\">{datetime2}</font>  \n";
-                    }
-
-
-                    string token = GetAccessToken();
-                    string msg = string.Empty;
-                    if (istest)
-                    {
-                        //测试
-                        msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(info.Dfysdm?.ToString().Trim()))
+                        WjzInfo wjzInfo = new WjzInfo();
+                        wjzInfo.CriticalType = Convert.ToInt32(row["CriticalType"].ToString().Trim()); //1门诊 2住院
+                        wjzInfo.Hzxm = row["Hzxm"].ToString();
+                        wjzInfo.Bgdh = row["BGDH"]?.ToString();
+                        wjzInfo.Bgsj = row["BGSJ"]?.ToString();
+                        wjzInfo.CriticalValue = Convert.ToDecimal(row["CriticalValue"]?.ToString().Trim());//危急值主表序号
+                        wjzInfo.SendTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                        //wjzInfo.Wjnr = row["Wjnr"].ToString();
+                        if (wjzInfo.CriticalType == 2)
                         {
-                            //正式
-                            msg = SendTextMessageMarkdown(sendUrl, token, info.Dfysdm?.ToString().Trim(), content);
+                            wjzInfo.Zyhm = row["ZYHM"]?.ToString();
                         }
                         else
                         {
-                            //开单医生代码为空时，使用配置的测试用户
-                            msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
+                            wjzInfo.Patid = Convert.ToDecimal((row["PATID"] ?? "-1").ToString().Trim());
                         }
-                        //正式
-                        //msg = SendTextMessageMarkdown(sendUrl, token, info.Dfysdm?.ToString().Trim(), content);
+                        wjzInfo.Ysdfzt = (row["YSDFZT"] ?? "-1").ToString().Trim();  //0未答复 1已答复
+                        wjzsendedInfosList.Add(wjzInfo);
                     }
-
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
-                    if (data.errmsg == "ok" || data.errcode == 81013)
-                    {
-                        //foreach (WjzInfo info2 in wjzInfoszy)
-                        //{
-                            info.是否推送成功 = "成功";
-                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        //}
-                    }
-                    else
-                    {
-                        //foreach (WjzInfo info2 in wjzInfoszy)
-                        //{
-                            info.是否推送成功 = "失败";
-                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                        //}
-                    }
-                    string xxx = string.Empty;
-                    if (istest)
-                    {
-                        xxx = textBox1.Text.ToString().Trim() + " (测试数据)";
-                    }
-                    else
-                    {
-                        xxx = info.Dfysdm?.ToString().Trim();
-                    }
-
-                    WriteLog("url:" + sendUrl + "    \r\n  token:" + token + "  \r\n userid:" + xxx + " \r\n  sendmessage:" + content + " \r\n  回参:" + msg);
-
-
-
                 }
 
-                try
+
+
+
+
+
+                //门诊
+                if (wjzBeginSendInfosList.Count != 0 && wjzBeginSendInfosList.Exists(r => r.CriticalType == 1))//门诊CriticalType是1
                 {
-                    if (wjzInfoszy.Exists(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))//新增
+                    foreach (WjzInfo wjzInfo in wjzBeginSendInfosList.Where(r => r.CriticalType == 1))
                     {
-                        StringBuilder sql331 = new StringBuilder("INSERT INTO SendWeChatCriticalValue (CriticalType, HZXM,BGDH,BGSJ,CriticalValue,SENDTIME,ZYHM,YSDFZT) VALUES ");
-                        foreach (WjzInfo info in wjzInfoszy.Where(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))
+                        if (!wjzsendedInfosList.FindAll(r => r.CriticalType == wjzInfo.CriticalType).Exists(r => r.CriticalValue == wjzInfo.CriticalValue))
                         {
-                            string name = string.Empty;
-                            if (info.Hzxm.Length > 16)
+                            wjzInfo.Gxlx = 1; //新增
+                            wjzInfosmz.Add(wjzInfo);
+                        }
+                        else
+                        {
+                            if (wjzsendedInfosList.FindAll(r => r.CriticalType == wjzInfo.CriticalType).Exists(r => r.CriticalValue == wjzInfo.CriticalValue && r.Ysdfzt != wjzInfo.Ysdfzt))
                             {
-                                name = info.Hzxm.Substring(0, 16);
+                                wjzInfo.Gxlx = 2; //更新
+                                wjzInfosmz.Add(wjzInfo);
+                            }
+                        }
+                    }
+                }
+
+                //住院
+                if (wjzBeginSendInfosList.Count != 0 && wjzBeginSendInfosList.Exists(r => r.CriticalType == 2))//住院CriticalType是2
+                {
+                    foreach (WjzInfo wjzInfo in wjzBeginSendInfosList.Where(r => r.CriticalType == 2))
+                    {
+                        if (!wjzsendedInfosList.FindAll(r => r.CriticalType == wjzInfo.CriticalType).Exists(r => r.CriticalValue == wjzInfo.CriticalValue))
+                        {
+                            wjzInfo.Gxlx = 1; //新增
+                            wjzInfoszy.Add(wjzInfo);
+                        }
+                        else
+                        {
+                            if (wjzsendedInfosList.FindAll(r => r.CriticalType == wjzInfo.CriticalType).Exists(r => r.CriticalValue == wjzInfo.CriticalValue && r.Ysdfzt != wjzInfo.Ysdfzt))
+                            {
+                                wjzInfo.Gxlx = 2; //更新
+                                wjzInfoszy.Add(wjzInfo);
+                            }
+                        }
+                    }
+                }
+
+                string datetime2 = DateTime.Now.ToString("yyyy年MM月dd日");
+                //string datetime3  = DateTime.Now.ToString("yyyy年MM月dd日");
+                //门诊
+                if (wjzInfosmz.Count != 0)
+                {
+                    // 第一步推送掉数据  第二天R数据 完全没有的先插入,已有的状态更新掉
+
+                    foreach (WjzInfo info in wjzInfosmz)
+                    {
+                        //string accessToken = GetAccessToken();
+                        string content = "";
+                        //string content1 = "";
+                        //string content2 = "";
+                        //string content3 = "";
+                        //string content4 = "";
+                        if (info.Ysdfzt == "0")
+                        {
+                            content = $"`门急诊患者危急值通知(未处理)`\r\n" +
+                                        $"**事项详情:**  \r\n" +
+                                        $"<font color=\"blue\"> \r\n" +
+
+                                       $" 患者姓名：{info.Hzxm} " +
+                                        "\r\n" +
+                                       //$" 患者PATID：{info.Patid} " +
+                                       //"\r\n" +
+                                       //$" 报告单号：{info.Bgdh} " +
+                                       //"\r\n" +
+                                       $" 送检时间：{info.Sjrq} " +
+                                       "\r\n" +
+                                       $" 报告时间：{info.Bgsj} " +
+                                       "\r\n" +
+                                       $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
+                                       "\r\n" +
+                                       $" 送检科室：{info.Sjksmc} " +
+                                       "\r\n" +
+                                       $" 开单医生：{info.Sjkdysmc} " +
+                                        $"</font>     \r\n" +
+                                       $"消息日期：<font color=\"warning\">{datetime2}</font>  \n";
+                            ;
+
+                        }
+                        if (info.Ysdfzt == "1")
+                        {
+                            content = $"`门急诊患者危急值通知(已处理)`\r\n" +
+                                        $"**事项详情:**  \r\n" +
+                                        $"<font color=\"info\"> \r\n" +
+                                       $" 患者姓名：{info.Hzxm} " +
+                                        "\r\n" +
+                                       //$" 患者PATID：{info.Patid} " +
+                                       // "\r\n" +
+                                       //$" 报告单号：{info.Bgdh} " +
+                                       // "\r\n" +
+                                       $" 送检时间：{info.Sjrq} " +
+                                        "\r\n" +
+                                        $" 报告时间：{info.Bgsj} " +
+                                         "\r\n" +
+                                        $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
+                                        "\r\n" +
+                                        $" 送检科室：{info.Sjksmc} " +
+                                         "\r\n" +
+                                        $" 开单医生：{info.Sjkdysmc} " +
+                                         "\r\n" +
+                                        $" 处理医生：{info.Jsysmc} " +
+                                         "\r\n" +
+                                        $" 处理时间：{info.Ysjssj} " +
+                                         "\r\n" +
+                                        $" 医生答复内容：{info.Ysdfnr} " +
+                                         "\r\n" +
+                                        $"</font>     \r\n" +
+                                        $"消息日期：<font color=\"warning\">{datetime2}</font>  \n";
+                        }
+
+
+                        string token = GetAccessToken();
+                        string msg = string.Empty;
+                        if (istest)
+                        {
+                            //测试
+                            msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(info.Sjkdysdm?.ToString().Trim()))
+                            {
+                                //正式
+                                msg = SendTextMessageMarkdown(sendUrl, token, info.Sjkdysdm?.ToString().Trim(), content);
                             }
                             else
                             {
-                                name = info.Hzxm;
+                                //开单医生代码为空时，使用配置的测试用户
+                                msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
                             }
-                            sql331.AppendFormat("(2, '{0}','{1}','{2}',{3},'{4}',{5},{6}),", name, info.Bgdh, info.Bgsj, info.CriticalValue, info.SendTime, info.Zyhm, info.Ysdfzt);
                         }
-                        sql331.Length--; // 移除末尾逗号
-                        DbHelper.ExecuteNonQuery(sql331.ToString(), null);
+
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
+                        if (data.errmsg == "ok" || data.errcode == 81013)//81013 表示这个患者没有企业微信里注册
+                        {
+                            //foreach (WjzInfo info2 in wjzInfosmz)
+                            //{
+                            info.是否推送成功 = "成功";
+                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            //}
+                        }
+                        else
+                        {
+                            //foreach (WjzInfo info2 in wjzInfosmz)
+                            //{
+                            info.是否推送成功 = "失败";
+                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            //}
+                        }
+                        string xxx = string.Empty;
+                        if (istest)
+                        {
+                            xxx = textBox1.Text.ToString().Trim() + " (测试数据)";
+                        }
+                        else
+                        {
+                            xxx = info.Sjkdysdm;
+                        }
+
+                        WriteLog("url:" + sendUrl + "    \r\n  token:" + token + "  \r\n userid:" + xxx + " \r\n  sendmessage:" + content + " \r\n  回参:" + msg);
+
+
+
                     }
 
-                    if (wjzInfoszy.Exists(r => r.Gxlx == 2 && r.是否推送成功 == "成功"))//更新
+                    try
                     {
-                        string CriticalValuestr = string.Join(",", wjzInfoszy.Where(r => r.Gxlx == 2 && r.是否推送成功 == "成功").Select(x => x.CriticalValue));
+                        if (wjzInfosmz.Exists(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))//新增
+                        {
+                            StringBuilder sql33 = new StringBuilder("INSERT INTO SendWeChatCriticalValue (CriticalType, HZXM,BGDH,BGSJ,CriticalValue,SENDTIME,PATID,YSDFZT) VALUES ");
+                            foreach (WjzInfo info in wjzInfosmz.Where(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))
+                            {
+                                string name = string.Empty;
+                                if (info.Hzxm.Length > 16)
+                                {
+                                    name = info.Hzxm.Substring(0, 16);
+                                }
+                                else
+                                {
+                                    name = info.Hzxm;
+                                }
+                                sql33.AppendFormat("(1, '{0}','{1}','{2}',{3},'{4}',{5},{6}),", name, info.Bgdh, info.Bgsj, info.CriticalValue, info.SendTime, info.Patid, info.Ysdfzt);
+                            }
+                            sql33.Length--; // 移除末尾逗号
+                            DbHelper.ExecuteNonQuery(sql33.ToString(), null);
+                        }
 
-                        string sql451 = "update SendWeChatCriticalValue set YSDFZT=1 where YSDFZT=0  and CriticalType=2 and CriticalValue in (" + CriticalValuestr + ")";
+                        if (wjzInfosmz.Exists(r => r.Gxlx == 2 && r.是否推送成功 == "成功"))//更新
+                        {
+                            string CriticalValuestr = string.Join(",", wjzInfosmz.Where(r => r.Gxlx == 2 && r.是否推送成功 == "成功").Select(x => x.CriticalValue));
 
-                        WriteLog("更新sql语句:" + sql451);
+                            string sql45 = "update SendWeChatCriticalValue set YSDFZT=1 where YSDFZT=0  and CriticalType=1 and CriticalValue in (" + CriticalValuestr + ")";
 
-                        DbHelper.ExecuteNonQuery(sql451, null);
+                            WriteLog("更新sql语句:" + sql45);
+
+                            DbHelper.ExecuteNonQuery(sql45, null);
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteErrorLog("更新sql语句异常:" + ex.Message);
 
                     }
+
+
                 }
-                catch (Exception ex)
+
+
+
+
+
+                //住院
+                if (wjzInfoszy.Count != 0)
                 {
-                    WriteErrorLog("更新sql语句异常:" + ex.Message);
+                    // 第一步推送掉数据  第二天R数据 完全没有的先插入,已有的状态更新掉
+
+                    foreach (WjzInfo info in wjzInfoszy)
+                    {
+                        //string accessToken = GetAccessToken();
+                        string content = "";
+                        //string content1 = "";
+                        //string content2 = "";
+                        //string content3 = "";
+                        //string content4 = "";
+                        if (info.Ysdfzt == "0" || info.Ysdfzt == "11")
+                        {
+
+                            content = $"`住院患者危急值通知(未处理)`\r\n" +
+                                        $"**事项详情:**  \r\n" +
+                                        $"<font color=\"blue\"> \r\n" +
+
+                                       $" 患者姓名：{info.Hzxm} " +
+                                        "\r\n" +
+                                       //$" 患者PATID：{info.Patid} " +
+                                       //"\r\n" +
+                                       //$" 报告单号：{info.Bgdh} " +
+                                       //"\r\n" +
+                                       //$" 送检时间：{info.Sjrq} " +
+                                       //"\r\n" +
+                                       $" 报告时间：{info.Bgsj.Replace("-", "")} " +
+                                       "\r\n" +
+                                       $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
+                                       "\r\n" +
+                                       $" 送检科室：{info.Sjksmc} " +
+                                       "\r\n" +
+                                       $" 接收医生：{info.Dfysmc} " +
+                                        $"</font>     \r\n" +
+                                       $"消息日期：<font color=\"warning\">{datetime2}</font>  \n";
+                            ;
+
+                        }
+                        if (info.Ysdfzt == "1")
+                        {
+                            content = $"`住院患者危急值通知(已处理)`\r\n" +
+                                        $"**事项详情:**  \r\n" +
+                                        $"<font color=\"info\"> \r\n" +
+                                       $" 患者姓名：{info.Hzxm} " +
+                                        "\r\n" +
+                                        //$" 患者PATID：{info.Patid} " +
+                                        // "\r\n" +
+                                        //$" 报告单号：{info.Bgdh} " +
+                                        // "\r\n" +
+                                        //$" 送检时间：{info.Sjrq} " +
+                                        // "\r\n" +
+                                        $" 报告时间：{info.Bgsj.Replace("-", "")} " +
+                                         "\r\n" +
+                                        $" 危急值内容：{info.Wjnr.Replace("\n", "").Replace("\r", "")} " +
+                                        "\r\n" +
+                                        $" 送检科室：{info.Sjksmc} " +
+                                         "\r\n" +
+                                        $" 接收医生：{info.Dfysmc} " +
+                                         "\r\n" +
+                                        $" 处理医生：{info.Jsysmc} " +
+                                         "\r\n" +
+                                        $" 处理时间：{info.Czsj.Replace("-", "")} " +
+                                         "\r\n" +
+                                        $" 医生答复内容：{info.Ysdfnr} " +
+                                         "\r\n" +
+                                        $"</font>     \r\n" +
+                                        $"消息日期：<font color=\"warning\">{datetime2}</font>  \n";
+                        }
+
+
+                        string token = GetAccessToken();
+                        string msg = string.Empty;
+                        if (istest)
+                        {
+                            //测试
+                            msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(info.Dfysdm?.ToString().Trim()))
+                            {
+                                //正式
+                                msg = SendTextMessageMarkdown(sendUrl, token, info.Dfysdm?.ToString().Trim(), content);
+                            }
+                            else
+                            {
+                                //开单医生代码为空时，使用配置的测试用户
+                                msg = SendTextMessageMarkdown(sendUrl, token, textBox1.Text.ToString().Trim(), content);
+                            }
+                            //正式
+                            //msg = SendTextMessageMarkdown(sendUrl, token, info.Dfysdm?.ToString().Trim(), content);
+                        }
+
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
+                        if (data.errmsg == "ok" || data.errcode == 81013)
+                        {
+                            //foreach (WjzInfo info2 in wjzInfoszy)
+                            //{
+                            info.是否推送成功 = "成功";
+                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            //}
+                        }
+                        else
+                        {
+                            //foreach (WjzInfo info2 in wjzInfoszy)
+                            //{
+                            info.是否推送成功 = "失败";
+                            info.推送时间 = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            //}
+                        }
+                        string xxx = string.Empty;
+                        if (istest)
+                        {
+                            xxx = textBox1.Text.ToString().Trim() + " (测试数据)";
+                        }
+                        else
+                        {
+                            xxx = info.Dfysdm?.ToString().Trim();
+                        }
+
+                        WriteLog("url:" + sendUrl + "    \r\n  token:" + token + "  \r\n userid:" + xxx + " \r\n  sendmessage:" + content + " \r\n  回参:" + msg);
+
+
+
+                    }
+
+                    try
+                    {
+                        if (wjzInfoszy.Exists(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))//新增
+                        {
+                            StringBuilder sql331 = new StringBuilder("INSERT INTO SendWeChatCriticalValue (CriticalType, HZXM,BGDH,BGSJ,CriticalValue,SENDTIME,ZYHM,YSDFZT) VALUES ");
+                            foreach (WjzInfo info in wjzInfoszy.Where(r => r.Gxlx == 1 && r.是否推送成功 == "成功"))
+                            {
+                                string name = string.Empty;
+                                if (info.Hzxm.Length > 16)
+                                {
+                                    name = info.Hzxm.Substring(0, 16);
+                                }
+                                else
+                                {
+                                    name = info.Hzxm;
+                                }
+                                sql331.AppendFormat("(2, '{0}','{1}','{2}',{3},'{4}',{5},{6}),", name, info.Bgdh, info.Bgsj, info.CriticalValue, info.SendTime, info.Zyhm, info.Ysdfzt);
+                            }
+                            sql331.Length--; // 移除末尾逗号
+                            DbHelper.ExecuteNonQuery(sql331.ToString(), null);
+                        }
+
+                        if (wjzInfoszy.Exists(r => r.Gxlx == 2 && r.是否推送成功 == "成功"))//更新
+                        {
+                            string CriticalValuestr = string.Join(",", wjzInfoszy.Where(r => r.Gxlx == 2 && r.是否推送成功 == "成功").Select(x => x.CriticalValue));
+
+                            string sql451 = "update SendWeChatCriticalValue set YSDFZT=1 where YSDFZT=0  and CriticalType=2 and CriticalValue in (" + CriticalValuestr + ")";
+
+                            WriteLog("更新sql语句:" + sql451);
+
+                            DbHelper.ExecuteNonQuery(sql451, null);
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        WriteErrorLog("更新sql语句异常:" + ex.Message);
+
+                    }
+
+
+                    dataGridView1.DataSource = wjzInfosmz.Union(wjzInfoszy).ToList();
 
                 }
+            }
+            catch(Exception ex)
+            {
+                WriteErrorLog("推送危急值消息异常:" + ex.Message);
+                
+                //MessageBox.Show("推送危急值消息异常，请查看日志文件！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-
-                dataGridView1.DataSource=wjzInfosmz.Union(wjzInfoszy).ToList();
 
             }
 
