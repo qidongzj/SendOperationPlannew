@@ -326,7 +326,7 @@ namespace SendOperationPlan
             DataTable dt2 = DbHelper.GetData(sql, CommandType.Text, null);
             if (dt2 == null || dt2.Rows.Count == 0)
             {
-                WriteLog("当日无外籍人士门诊住院就诊");
+                WriteLog("当下无外籍人士门诊住院就诊");
                 return;
             }
             else
