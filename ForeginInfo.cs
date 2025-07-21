@@ -32,6 +32,8 @@ namespace SendOperationPlan
         public string ghlbmc { get; set; } // 
         public string ybmc { get; set; } // 医保名称
 
+        public string zje { get; set; } 
+
 
 
         /// <summary>

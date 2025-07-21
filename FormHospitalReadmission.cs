@@ -310,7 +310,15 @@ namespace SendOperationPlan
 
             if (istest)
             {
-                sql = "select  '门诊' MzOrZy,FLOOR(DATEDIFF(DAY, birth, GETDATE()) / 365.25) AS age ,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx,b.ghrq as dyrq,sex, a.patid,a.blh,a.hzxm,a.sfzh,b.ksmc ,c.lbmc as ghlbmc ,d.rqflmc ybmc   from THIS4.dbo.SF_BRXXK a (nolock) join THIS4.dbo.GH_GHZDK b (nolock)\r\non a.patid=b.patid left join THIS4.dbo.GH_GHLBK c on c.lbxh=b.ghlb left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\nWHERE a.zjlx in ('1','9','21','26') \r\nand len(a.sfzh)!=18 and len(a.sfzh)>0  and b.ghrq>'" + dt + "'\r\n union\r\n select  '住院' MzOrZy,FLOOR(DATEDIFF(DAY, a.birth, GETDATE()) / 365.25) AS age,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx, b.ryrq as dyrq, a.sex, a.patid,a.blh,a.hzxm,a.sfzh,c.name as ksmc , '' as ghlbmc,d.rqflmc ybmc from THIS4.dbo.ZY_BRXXK a (nolock) join THIS4.dbo.ZY_BRSYK b(nolock) \r\n on a.patid=b.patid \r\n join THIS4.dbo.YY_KSBMK c(nolock) on c.id=b.ksdm left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\n  WHERE  a.zjlx in ('1','9','21','26') and len(a.sfzh)>0   and len(a.sfzh)!=18 and b.ryrq>'" + dt + "' and a.sfzh not like '未报%' and a.sfzh not like '户口%' and a.sfzh not like '新生%'  and a.sfzh not like '未上户口%'\r\n  and a.sfzh not like '未带%'   and a.sfzh not like '儿童%'   and a.sfzh not like '出生儿未上户口%'  and a.sfzh not like '无户口%' and a.sfzh not like '没有%' and a.sfzh not like '无%'";
+
+                DateTime now = DateTime.Now;
+                DateTime hourZero = now.Date.AddHours(now.Hour); // 精确到小时，分秒归零
+                string d1 = hourZero.ToString("yyyyMMddHH:mm:ss");
+                string d2 = hourZero.AddDays(-1).ToString("yyyyMMddHH:mm:ss");
+                sql = "select   cast(ROUND(f.zje,2) as VARCHAR(10))+' 元' as zje ,'门诊' MzOrZy,FLOOR(DATEDIFF(DAY, birth, GETDATE()) / 365.25) AS age ,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx,b.ghrq as dyrq,a.sex, a.patid,a.blh,a.hzxm,a.sfzh,b.ksmc ,case c.lbxh when 9 then( case  when k.memo like '%普通%' then '普通' when k.memo  like '%专家%' then '专家' when k.memo  like '%特需%' then '特需'  when k.memo  like '%专病%' then '专病' else '其他' end ) else \r\nc.lbmc end as ghlbmc  ,d.rqflmc ybmc   from THIS4.dbo.SF_BRXXK a (nolock) join THIS4.dbo.GH_GHZDK b (nolock)\r\non a.patid=b.patid left join THIS4.dbo.GH_GHLBK c on c.lbxh=b.ghlb left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm left join  THIS4.[dbo].[SF_BRJSK] f(nolock) on f.sjh=b.jssjh  left join THIS4.dbo.GH_SH_GHYYK g (nolock) on g.xh=b.yyxh \r\nleft join  THIS4.dbo.GH_YY_PBZBMX h(nolock) on g.zjxh=h.pbmxid\r\nleft join THIS4.dbo.GH_YY_MBK k(nolock) on k.id=h.mbid \r\nWHERE a.zjlx in ('1','9','21','26') \r\nand len(a.sfzh)!=18 and len(a.sfzh)>0  and ( b.ghrq<'" + d1 + "' and b.ghrq>='" + d2 + "') and b.jlzt=0  \r\n union\r\n select '-' zje ,'住院' MzOrZy,FLOOR(DATEDIFF(DAY, a.birth, GETDATE()) / 365.25) AS age,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx, b.ryrq as dyrq, a.sex, a.patid,a.blh,a.hzxm,a.sfzh,c.name as ksmc , '' as ghlbmc,d.rqflmc ybmc from THIS4.dbo.ZY_BRXXK a (nolock) join THIS4.dbo.ZY_BRSYK b(nolock) \r\n on a.patid=b.patid \r\n join THIS4.dbo.YY_KSBMK c(nolock) on c.id=b.ksdm left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\n  WHERE  a.zjlx in ('1','9','21','26') and len(a.sfzh)>0   and len(a.sfzh)!=18 and ( b.ryrq<'" + d1 + "' and  b.ryrq>='" + d2 + "') and a.sfzh not like '未报%' and a.sfzh not like '户口%' and a.sfzh not like '新生%'  and a.sfzh not like '未上户口%'\r\n  and a.sfzh not like '未带%'   and a.sfzh not like '儿童%'   and a.sfzh not like '出生儿未上户口%'  and a.sfzh not like '无户口%' and a.sfzh not like '没有%' and a.sfzh not like '无%'   and  b.brzt!=9 and a.jlzt=0 ";
+
+
+                //sql = "select  f.zje as zje,'门诊' MzOrZy,FLOOR(DATEDIFF(DAY, birth, GETDATE()) / 365.25) AS age ,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx,b.ghrq as dyrq,sex, a.patid,a.blh,a.hzxm,a.sfzh,b.ksmc ,c.lbmc as ghlbmc ,d.rqflmc ybmc   from THIS4.dbo.SF_BRXXK a (nolock) join THIS4.dbo.GH_GHZDK b (nolock)\r\non a.patid=b.patid left join THIS4.dbo.GH_GHLBK c on c.lbxh=b.ghlb left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm left join  THIS4.[dbo].[SF_BRJSK] f(nolock) on f.sjh=b.jssjh \r\nWHERE a.zjlx in ('1','9','21','26') \r\nand len(a.sfzh)!=18 and len(a.sfzh)>0  and b.ghrq>'" + dt + "' and b.ghlb!=9\r\n union\r\n select '-' zje ,  '住院' MzOrZy,FLOOR(DATEDIFF(DAY, a.birth, GETDATE()) / 365.25) AS age,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx, b.ryrq as dyrq, a.sex, a.patid,a.blh,a.hzxm,a.sfzh,c.name as ksmc , '' as ghlbmc,d.rqflmc ybmc from THIS4.dbo.ZY_BRXXK a (nolock) join THIS4.dbo.ZY_BRSYK b(nolock) \r\n on a.patid=b.patid \r\n join THIS4.dbo.YY_KSBMK c(nolock) on c.id=b.ksdm left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\n  WHERE  a.zjlx in ('1','9','21','26') and len(a.sfzh)>0   and len(a.sfzh)!=18 and b.ryrq>'" + dt + "' and a.sfzh not like '未报%' and a.sfzh not like '户口%' and a.sfzh not like '新生%'  and a.sfzh not like '未上户口%'\r\n  and a.sfzh not like '未带%'   and a.sfzh not like '儿童%'   and a.sfzh not like '出生儿未上户口%'  and a.sfzh not like '无户口%' and a.sfzh not like '没有%' and a.sfzh not like '无%'";
             }
             else 
             {
@@ -319,7 +327,7 @@ namespace SendOperationPlan
                 string d1 = hourZero.ToString("yyyyMMddHH:mm:ss");
                 string d2 = hourZero.AddHours(-1).ToString("yyyyMMddHH:mm:ss");
 
-                sql = "select  '门诊' MzOrZy,FLOOR(DATEDIFF(DAY, birth, GETDATE()) / 365.25) AS age ,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx,b.ghrq as dyrq,sex, a.patid,a.blh,a.hzxm,a.sfzh,b.ksmc ,c.lbmc as ghlbmc ,d.rqflmc ybmc   from THIS4.dbo.SF_BRXXK a (nolock) join THIS4.dbo.GH_GHZDK b (nolock)\r\non a.patid=b.patid left join THIS4.dbo.GH_GHLBK c on c.lbxh=b.ghlb left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\nWHERE a.zjlx in ('1','9','21','26') \r\nand len(a.sfzh)!=18 and len(a.sfzh)>0  and ( b.ghrq<'"+d1+"' and b.ghrq>='" + d2 + "') \r\n union\r\n select  '住院' MzOrZy,FLOOR(DATEDIFF(DAY, a.birth, GETDATE()) / 365.25) AS age,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx, b.ryrq as dyrq, a.sex, a.patid,a.blh,a.hzxm,a.sfzh,c.name as ksmc , '' as ghlbmc,d.rqflmc ybmc from THIS4.dbo.ZY_BRXXK a (nolock) join THIS4.dbo.ZY_BRSYK b(nolock) \r\n on a.patid=b.patid \r\n join THIS4.dbo.YY_KSBMK c(nolock) on c.id=b.ksdm left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\n  WHERE  a.zjlx in ('1','9','21','26') and len(a.sfzh)>0   and len(a.sfzh)!=18 and ( b.ryrq<'"+d1+"' and  b.ryrq>='" + d2 + "') and a.sfzh not like '未报%' and a.sfzh not like '户口%' and a.sfzh not like '新生%'  and a.sfzh not like '未上户口%'\r\n  and a.sfzh not like '未带%'   and a.sfzh not like '儿童%'   and a.sfzh not like '出生儿未上户口%'  and a.sfzh not like '无户口%' and a.sfzh not like '没有%' and a.sfzh not like '无%'";
+                sql = "select   cast(ROUND(f.zje,2) as VARCHAR(10))+' 元' as zje ,'门诊' MzOrZy,FLOOR(DATEDIFF(DAY, birth, GETDATE()) / 365.25) AS age ,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx,b.ghrq as dyrq,a.sex, a.patid,a.blh,a.hzxm,a.sfzh,b.ksmc ,case c.lbxh when 9 then( case  when k.memo like '%普通%' then '普通' when k.memo  like '%专家%' then '专家' when k.memo  like '%特需%' then '特需'  when k.memo  like '%专病%' then '专病' else '其他' end ) else \r\nc.lbmc end as ghlbmc  ,d.rqflmc ybmc   from THIS4.dbo.SF_BRXXK a (nolock) join THIS4.dbo.GH_GHZDK b (nolock)\r\non a.patid=b.patid left join THIS4.dbo.GH_GHLBK c on c.lbxh=b.ghlb left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm left join  THIS4.[dbo].[SF_BRJSK] f(nolock) on f.sjh=b.jssjh  left join THIS4.dbo.GH_SH_GHYYK g (nolock) on g.xh=b.yyxh \r\nleft join  THIS4.dbo.GH_YY_PBZBMX h(nolock) on g.zjxh=h.pbmxid\r\nleft join THIS4.dbo.GH_YY_MBK k(nolock) on k.id=h.mbid \r\nWHERE a.zjlx in ('1','9','21','26') \r\nand len(a.sfzh)!=18 and len(a.sfzh)>0  and ( b.ghrq<'" + d1+"' and b.ghrq>='" + d2 + "') and b.jlzt=0  \r\n union\r\n select '-' zje ,'住院' MzOrZy,FLOOR(DATEDIFF(DAY, a.birth, GETDATE()) / 365.25) AS age,case  a.zjlx when 1 then '护照' when 26 then '外国人永久居留身份证' else '其他' end as zjlx, b.ryrq as dyrq, a.sex, a.patid,a.blh,a.hzxm,a.sfzh,c.name as ksmc , '' as ghlbmc,d.rqflmc ybmc from THIS4.dbo.ZY_BRXXK a (nolock) join THIS4.dbo.ZY_BRSYK b(nolock) \r\n on a.patid=b.patid \r\n join THIS4.dbo.YY_KSBMK c(nolock) on c.id=b.ksdm left join THIS4.dbo.YY_YBFLK d on d.ybdm=b.ybdm \r\n  WHERE  a.zjlx in ('1','9','21','26') and len(a.sfzh)>0   and len(a.sfzh)!=18 and ( b.ryrq<'" + d1+"' and  b.ryrq>='" + d2 + "') and a.sfzh not like '未报%' and a.sfzh not like '户口%' and a.sfzh not like '新生%'  and a.sfzh not like '未上户口%'\r\n  and a.sfzh not like '未带%'   and a.sfzh not like '儿童%'   and a.sfzh not like '出生儿未上户口%'  and a.sfzh not like '无户口%' and a.sfzh not like '没有%' and a.sfzh not like '无%'   and  b.brzt!=9 and a.jlzt=0 ";
 
             }
 
@@ -348,6 +356,7 @@ namespace SendOperationPlan
                     foregin.zjlx = dr["zjlx"].ToString(); // 就诊类型
                     foregin.ghlbmc = dr["ghlbmc"].ToString(); 
                     foregin.ybmc = dr["ybmc"].ToString(); // 医保名称
+                    foregin.zje = dr["zje"].ToString(); // 费用
                     foreginlist.Add(foregin);
                 }
 
@@ -380,12 +389,20 @@ namespace SendOperationPlan
                         sendtext += $"挂号类别:" + info.ghlbmc + "\r\n";
                         sendtext += $"医保费别:" + info.ybmc + "\r\n";
                         sendtext += $"证件类型:" + info.zjlx + "\r\n";
-                        sendtext += $"证件号:" +info.sfzh + "\r\n";
+                        //sendtext += $"证件号:" +info.sfzh + "\r\n";
+                        if (info.MzOrZy == "门诊")
+                        {
+                            sendtext += $"挂号金额:" + info.zje + "\r\n";
+                        }
+                        else 
+                        {
+                            sendtext += $"证件号:" + info.sfzh + "\r\n";
+                        }
                         if (info.MzOrZy == "住院")
                         {
                             sendtext += $"入院日期:" + info.dyrq + "\r\n";
                         }
-                        else 
+                        else
                         {
                             sendtext += $"就诊日期:" + info.dyrq + "\r\n";
                         }
