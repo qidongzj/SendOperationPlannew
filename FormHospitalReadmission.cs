@@ -369,7 +369,7 @@ namespace SendOperationPlan
                         return;
                     }
                     //string content = "";
-                    string userid = "2382|3024"; // 
+                    string userid = "1227|2581|2382|3024"; // 
                     if (istest)
                     {
                         userid = "2382|3024"; // 测试账号
