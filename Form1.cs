@@ -1,19 +1,19 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;  // 推荐使用Newtonsoft.Json处理JSON数据[3,5](@ref)
 using System.Drawing;
+using System.Drawing.Text;
+using System.IO;
 using System.Linq;
+// 必须引用命名空间
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-// 必须引用命名空间
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Data.SqlClient;
-using System.Drawing.Text;
-using System.IO;
-using System.Diagnostics;  // 推荐使用Newtonsoft.Json处理JSON数据[3,5](@ref)
 
 namespace SendOperationPlan
 {
@@ -292,8 +292,8 @@ namespace SendOperationPlan
                 "A.FIRST_ASSISTANT) AS FIRST_ASSISTANT_NAME, ISNULL(rtrim(M.USER_NAME), A.SECOND_ASSISTANT) AS SECOND_ASSISTANT_NAME, ISNULL(rtrim(N.USER_NAME), A.THIRD_ASSISTANT) AS THIRD_ASSISTANT_NAME," +
                 "ISNULL(D.USER_NAME, A.SURGEON) AS SURGEON_NAME,  E.USER_NAME AS ANESTHESIA_DOCTOR_NAME, F.USER_NAME AS ANESTHESIA_ASSISTANT_NAME,  O.USER_NAME AS ANESTHESIA_ASSISTANT_NAME_TWO," +
                 " G.USER_NAME AS FIRST_OPERATION_NURSE_NAME, H.USER_NAME AS SECOND_OPERATION_NURSE_NAME, I.USER_NAME AS FIRST_SUPPLY_NURSE_NAME, J.USER_NAME AS SECOND_SUPPLY_NURSE_NAME,  " +
-                " K.USER_NAME AS THIRD_SUPPLY_NURSE_NAME, Q.DEPT_NAME AS WARD_CODE_NAME, case when A.VISIT_ID = 0 then '门诊' else '住院' end as SCHEDULE_TYPE ,   " +
-                "    CASE WHEN ISNULL(RTRIM(OPERATING_ROOM_NO), '-1') = '-1' THEN  T.DEPT_NAME  ELSE  T.DEPT_NAME  END AS OPERATING_DEPT_NAME,  CASE WHEN A.EMERGENCY_INDICATOR = 0 AND" +
+                " K.USER_NAME AS THIRD_SUPPLY_NURSE_NAME,Q.DEPT_CODE as WARD_CODE, Q.DEPT_NAME AS WARD_CODE_NAME, case when A.VISIT_ID = 0 then '门诊' else '住院' end as SCHEDULE_TYPE ,   " +
+                "    CASE WHEN ISNULL(RTRIM(OPERATING_ROOM_NO), '-1') = '-1' THEN  T.DEPT_NAME  ELSE  T.DEPT_NAME  END AS OPERATING_DEPT_NAME, T.DEPT_CODE as OPERATING_DEPT , CASE WHEN A.EMERGENCY_INDICATOR = 0 AND" +
                 "  A.SCHEDULED_DATE_TIME IS NOT NULL AND              CONVERT(VARCHAR(10), P.ADMISSION_DATE_TIME, 121) =  CONVERT(VARCHAR(10), A.SCHEDULED_DATE_TIME, 121) THEN  1  ELSE   0  END AS DAYTIME_OPERATION,SS.*,MM.BED_LABEL FROM [155.155.100.107].docare.dbo.MED_OPERATION_SCHEDULE A (nolock)" +
                 "  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_PAT_MASTER_INDEX B (nolock)   ON A.PATIENT_ID = B.PATIENT_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS D   ON A.SURGEON = D.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS E    ON A.ANESTHESIA_DOCTOR = E.USER_ID  LEFT OUTER JOIN" +
                 " [155.155.100.107].docare.dbo.MED_HIS_USERS F    ON A.ANESTHESIA_ASSISTANT = F.USER_ID  LEFT OUTER JOIN [155.155.100.107].docare.dbo.MED_HIS_USERS G    ON A.FIRST_OPERATION_NURSE = G.USER_ID  LEFT OUTER JOIN" +
@@ -343,8 +343,11 @@ namespace SendOperationPlan
                     sequence = dr["SEQUENCE"].ToString(),
 
                     sstime = resulttime,
+                    sstime2= dtt1.ToString("yyyy-MM-dd HH:mm"),
                     wardCodeName = dr["WARD_CODE_NAME"].ToString(),
+                    wardCode = dr["WARD_CODE"].ToString(),
                     operatdeptName = dr["OPERATING_DEPT_NAME"].ToString(),
+                    operatdept = dr["OPERATING_DEPT"].ToString(),
                     inpNo = dr["INP_NO"].ToString(),
                     patientId = dr["PATIENT_ID"].ToString(),
                     patName = dr["PAT_NAME"].ToString(),
@@ -451,6 +454,9 @@ namespace SendOperationPlan
                 {
                     //正式
                      msg = SendTextMessageMarkdown(sendUrl, token, userid, sendtext);
+
+                    //排班手术插到接口表
+
                 }
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(msg);
@@ -482,6 +488,30 @@ namespace SendOperationPlan
 
                 WriteLog("url:" + sendUrl + "    \r\n  token:" + token + "  \r\n userid:" + xxx + " \r\n  sendmessage:" + sendtext + " \r\n  回参:" + msg);
             }
+
+            if (T == false && istest == false)//
+            {
+                StringBuilder sql33 = new StringBuilder("insert into [155.155.50.122].DBLIS50.dbo.NoticeOperation(realtype,wardCode,wardCodeName,hzxm,operatingRoomNo,operatingRoomNoName,operatingRoom,taichi,sstime,lrrq,operatdept,operatdeptName,inpNo,patientId,patAge,sex,bedNo,operation,surgeon,surgeonName,anesthesiaMethod,operationScale) VALUES "); 
+                    
+
+                foreach (OperatInfo operatInfo in operatInfos)
+                {
+
+                    sql33.AppendFormat("('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}','{15}','{16}','{17}','{18}','{19}','{20}','{21}'),",
+                        "0",operatInfo.wardCode, operatInfo.wardCodeName, operatInfo.patName, operatInfo.operatingRoomNo, operatInfo.operatingRoomNoName, operatInfo.operatingRoom?.Trim()=="1032"? "住院手术室":"日间手术室", operatInfo.sequence,
+                        operatInfo.sstime2, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), operatInfo.operatdept, operatInfo.operatdeptName, operatInfo.inpNo, operatInfo.patientId,operatInfo.patAge,
+                        operatInfo.sex, operatInfo.bedNo, operatInfo.operation, operatInfo.surgeon, operatInfo.surgeonName, operatInfo.anesthesiaMethod, operatInfo.operationScale
+                      );
+               
+                }
+                sql33.Length--; // 移除末尾逗号
+                DbHelper.ExecuteNonQuery(sql33.ToString(), null);
+
+
+
+
+            }
+
 
             if (dataGridView1.InvokeRequired)
             {
@@ -887,6 +917,10 @@ namespace SendOperationPlan
                     {
                         //上午7点推送当天的手术排班
                         SendMessage(false, false);
+
+                      
+                        
+
 
                     }
                     if (checkBox2.Checked)

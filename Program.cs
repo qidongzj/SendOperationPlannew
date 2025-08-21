@@ -21,10 +21,10 @@ namespace SendOperationPlan
             //Application.Run(new FormWjz());
 
             //手术
-            //Application.Run(new Form1());
+            Application.Run(new Form1());
 
             //7日重复入院 /外籍人士入院
-            Application.Run(new FormHospitalReadmission());
+            //Application.Run(new FormHospitalReadmission());
 
             //中医优势病种
             //Application.Run(new FormZybz());

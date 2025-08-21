@@ -21,10 +21,17 @@ namespace SendOperationPlan
         public string sequence { get; set; }
         //手术时间
         public string sstime { get; set; }
+
+        public string sstime2 { get; set; } //手术时间2
+
+        //病区代码
+        public string wardCode { get; set; }
         //病区
         public string wardCodeName { get; set; }
         //科室
         public string operatdeptName { get; set; }
+
+        public string operatdept { get; set; }
         //住院号
         public string inpNo { get; set; }
         //病人ID
