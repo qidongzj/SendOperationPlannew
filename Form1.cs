@@ -491,7 +491,7 @@ namespace SendOperationPlan
 
             if (T == false && istest == false)//
             {
-                StringBuilder sql33 = new StringBuilder("insert into [155.155.50.122].DBLIS50.dbo.NoticeOperation(realtype,wardCode,wardCodeName,hzxm,operatingRoomNo,operatingRoomNoName,operatingRoom,taichi,sstime,lrrq,operatdept,operatdeptName,inpNo,patientId,patAge,sex,bedNo,operation,surgeon,surgeonName,anesthesiaMethod,operationScale) VALUES "); 
+                StringBuilder sql33 = new StringBuilder("insert into NoticeOperation(realtype,wardCode,wardCodeName,hzxm,operatingRoomNo,operatingRoomNoName,operatingRoom,taichi,sstime,lrrq,operatdept,operatdeptName,inpNo,patientId,patAge,sex,bedNo,operation,surgeon,surgeonName,anesthesiaMethod,operationScale) VALUES "); 
                     
 
                 foreach (OperatInfo operatInfo in operatInfos)
