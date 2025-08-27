@@ -26,6 +26,7 @@ namespace SendOperationPlan
             //7日重复入院 /外籍人士入院
             //Application.Run(new FormHospitalReadmission());
 
+
             //中医优势病种
             //Application.Run(new FormZybz());
         }

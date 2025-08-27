@@ -190,7 +190,7 @@ namespace SendOperationPlan
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(178, 50);
             this.button3.TabIndex = 10;
-            this.button3.Text = "校验(所有日期)";
+            this.button3.Text = "校验";
             this.button3.UseVisualStyleBackColor = true;
             // 
             // FormZybz

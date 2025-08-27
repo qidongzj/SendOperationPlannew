@@ -5,8 +5,6 @@ VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendOperationPlan", "SendOperationPlan.csproj", "{F319802A-81C5-49DC-8078-5AB723BD3C68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateApp", "..\UpdateApp\UpdateApp.csproj", "{6DCF724B-4EAB-4B2C-A98F-DCD7A6A1260F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{F319802A-81C5-49DC-8078-5AB723BD3C68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F319802A-81C5-49DC-8078-5AB723BD3C68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F319802A-81C5-49DC-8078-5AB723BD3C68}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6DCF724B-4EAB-4B2C-A98F-DCD7A6A1260F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6DCF724B-4EAB-4B2C-A98F-DCD7A6A1260F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6DCF724B-4EAB-4B2C-A98F-DCD7A6A1260F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6DCF724B-4EAB-4B2C-A98F-DCD7A6A1260F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

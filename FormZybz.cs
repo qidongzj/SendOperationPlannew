@@ -254,9 +254,17 @@ namespace SendOperationPlan
             }
             else 
             {
-                
-                DataSet ds= await DbHelper.QueryDataSetAsync(" exec CISDB.dbo.GetdifferentZyysbz '" + zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm + "'");
-                if (ds.Tables.Count ==2)
+                DataSet ds = null;
+                if (checkBox2.Checked)
+                {
+                     ds = await DbHelper.QueryDataSetAsync(" exec CISDB.dbo.GetdifferentZyysbz '" + zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm + "'");
+                }
+                else 
+                {
+                     ds = await DbHelper.QueryDataSetAsync(" exec CISDB.dbo.GetdifferentZyysbzForDate '" + zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm + "','" + dateTimePicker1.Value.ToString("yyyy-MM-dd hh:mm:ss") + "','" + dateTimePicker2.Value.ToString("yyyy-MM-dd hh:mm:ss") + "'");
+                }
+                //GetdifferentZyysbzForDate
+                if (ds.Tables.Count == 2)
                 {
                     //foreach (DataTable dt in ds.Tables)
                     //{
@@ -284,10 +292,10 @@ namespace SendOperationPlan
                         DataTable dt_temp = FilterByLinq(dt, ds.Tables[1]);
                         if (dt_temp == null || dt_temp.Rows.Count == 0)
                         {
-                           // dt_temp.Columns.Add("数据");
-                           // dt_temp.Columns.Add("模板代码");
-                           // dt_temp.Columns.Add("模板名称");
-                           // dt_temp.Columns.Add("EMRXH");
+                            // dt_temp.Columns.Add("数据");
+                            // dt_temp.Columns.Add("模板代码");
+                            // dt_temp.Columns.Add("模板名称");
+                            // dt_temp.Columns.Add("EMRXH");
                             DataRow dr1 = dt_temp.NewRow();
                             dr1["数据"] = "数据不存在";
                             dr1["模板代码"] = zylist.FirstOrDefault(r => r.mbmc == mbmc).mbdm;
@@ -297,7 +305,7 @@ namespace SendOperationPlan
                         }
                         dtlist.Add(dt_temp);
                     }
-                    else 
+                    else
                     {
                         //比较下空重取
                         DataTable dt_temp = FilterByLinq(ds.Tables[0], ds.Tables[1]);
@@ -352,7 +360,7 @@ namespace SendOperationPlan
                         dtlist.Add(dt_temp);
 
                     }
-                    else 
+                    else
                     {
 
                         DataTable dt_temp = FilterByLinq(ds.Tables[1], ds.Tables[0]);
@@ -376,8 +384,8 @@ namespace SendOperationPlan
                     }
 
 
-                        
-                    
+
+
 
                 }
 
