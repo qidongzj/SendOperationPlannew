@@ -764,6 +764,7 @@ namespace SendOperationPlan
                     if (checkBox2.Checked)
                     {
                         ryrq = string.Empty;
+
                     }
                     else
                     {
@@ -781,6 +782,9 @@ namespace SendOperationPlan
                 IsEnable(true);
                 //this.button3.Enabled = true;// 恢复按钮状态
                 //this.button2.Enabled = true;
+
+
+
             }
             catch (Exception ex)
             {
