@@ -417,7 +417,7 @@ namespace SendOperationPlan
             // DateTime t1 = DateTime.Now;
             foreach (string userid in userids)
             {
-                List<OperatInfo> infos = operatInfos.FindAll(x => x.surgeon == userid || x.firstAssistant == userid || x.anesthesiaDoctor == userid).OrderBy(r => r.sstime).ToList();
+                List<OperatInfo> infos = operatInfos.FindAll(x => x.surgeon == userid || x.firstAssistant == userid || x.anesthesiaDoctor == userid).OrderBy(r => r.operatingRoomNo).OrderBy(r=>r.sequence).ToList();
 
                 string sendtext = string.Empty;
                 sendtext += $"`您的手术排班通知`\r\n";
